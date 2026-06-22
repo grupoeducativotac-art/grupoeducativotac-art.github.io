@@ -1784,6 +1784,244 @@ if(DB.grupos.length===0){
   DB.config.decanos={'Ciencias Económicas y Empresariales':'Decano de Ciencias Económicas y Empresariales'};
   saveDB();
 }
+
+// ═══════════════════════════════════════════════════════
+// SUPABASE CONFIG
+// ═══════════════════════════════════════════════════════
+const SB_URL = 'https://fmssrbxldmanmgofiwvo.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZtc3NyYnhsZG1hbm1nb2Zpd3ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIwNzMwMDUsImV4cCI6MjA5NzY0OTAwNX0.CZjp-nEL72SqnPKXUMDSCoKr0kjGeUstq-lKtWN_EuA';
+const SB_HEADERS = {'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation'};
+
+// ═══════════════════════════════════════════════════════
+// API SUPABASE — Funciones base
+// ═══════════════════════════════════════════════════════
+async function sbGet(table, query=''){
+  const r = await fetch(`${SB_URL}/rest/v1/${table}${query}`, {headers: SB_HEADERS});
+  return r.ok ? r.json() : [];
+}
+async function sbPost(table, data){
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, {method:'POST', headers: SB_HEADERS, body: JSON.stringify(data)});
+  return r.ok ? r.json() : null;
+}
+async function sbPatch(table, filter, data){
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${filter}`, {method:'PATCH', headers: SB_HEADERS, body: JSON.stringify(data)});
+  return r.ok;
+}
+async function sbDelete(table, filter){
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?${filter}`, {method:'DELETE', headers: SB_HEADERS});
+  return r.ok;
+}
+async function sbUpsert(table, data, onConflict=''){
+  const url = `${SB_URL}/rest/v1/${table}${onConflict?`?on_conflict=${onConflict}`:''}`;
+  const r = await fetch(url, {method:'POST', headers: {...SB_HEADERS, 'Prefer': `resolution=merge-duplicates,return=representation`}, body: JSON.stringify(data)});
+  return r.ok ? r.json() : null;
+}
+
+// ═══════════════════════════════════════════════════════
+// SINCRONIZACIÓN — Cargar datos de Supabase a DB local
+// ═══════════════════════════════════════════════════════
+async function syncFromSupabase(){
+  showLoading(true);
+  try {
+    // Cargar grupos
+    const grupos = await sbGet('grupos', '?select=*');
+    const estudiantes = await sbGet('estudiantes', '?select=*');
+    const evaluaciones = await sbGet('evaluaciones', '?select=*');
+    const instrEntrada = await sbGet('instrumento_entrada', '?select=*');
+    const instrSalida = await sbGet('instrumento_salida', '?select=*');
+    const observaciones = await sbGet('observaciones', '?select=*');
+    const actividades = await sbGet('actividades', '?select=*');
+    const planMejora = await sbGet('plan_mejora', '?select=*');
+    const cfgArr = await sbGet('config', '?select=*&id=eq.1');
+
+    // Transformar grupos
+    DB.grupos = grupos.map(g => ({
+      id: g.id, periodo: g.periodo, sede: g.sede, modalidad: g.modalidad,
+      facultad: g.facultad, programa: g.programa,
+      asignatura: {codigo: g.asignatura_codigo, nombre: g.asignatura_nombre},
+      grupo: g.grupo, fechaInicio: g.fecha_inicio, fechaFin: g.fecha_fin,
+      docente: {documento: g.doc_docente, nombresApellidos: g.nombre_docente, correo: g.correo_docente,
+        get pass(){return String(this.documento).slice(-4);}},
+      estudiantes: estudiantes.filter(e => e.grupo_id === g.id).map(e => ({
+        documento: e.documento, nombresApellidos: e.nombres_apellidos,
+        correo: e.correo, equipo: e.equipo, semestre: e.semestre, grupo: e.grupo_letra,
+        get pass(){return String(this.documento).slice(-4);}
+      }))
+    }));
+
+    // Transformar evaluaciones
+    DB.evaluaciones = evaluaciones.map(e => ({
+      evaluadorEmail: e.evaluador_email, evaluadoEmail: e.evaluado_email,
+      grupoId: e.grupo_id, equipoNum: e.equipo_num,
+      ci: e.competencia_idx, ki: e.criterio_idx, val: e.valor, fecha: e.fecha
+    }));
+
+    // Instrumentos
+    DB.instrEntrada = instrEntrada.map(i => ({
+      email: i.email, grupoId: i.grupo_id,
+      respuestas: Array.isArray(i.respuestas) ? i.respuestas : JSON.parse(i.respuestas||'[]'),
+      fecha: i.fecha
+    }));
+    DB.instrSalida = instrSalida.map(i => ({
+      email: i.email, grupoId: i.grupo_id,
+      respuestas: Array.isArray(i.respuestas) ? i.respuestas : JSON.parse(i.respuestas||'[]'),
+      fecha: i.fecha
+    }));
+
+    // Observaciones
+    DB.observaciones = observaciones.map(o => ({
+      email: o.email, rol: o.rol, grupoId: o.grupo_id, texto: o.texto, fecha: o.fecha
+    }));
+
+    // Actividades
+    DB.actividades = actividades.map(a => ({
+      grupoId: a.grupo_id, numActividad: a.num_actividad,
+      nombre: a.nombre, descripcion: a.descripcion,
+      enlace: a.enlace, enlaceTexto: a.enlace_texto, fecha: a.fecha
+    }));
+
+    // Plan mejora
+    DB.planMejora = planMejora.map(p => ({
+      email: p.email, grupoId: p.grupo_id, texto: p.texto, fecha: p.fecha
+    }));
+
+    // Config
+    if(cfgArr && cfgArr.length > 0){
+      const cfg = cfgArr[0];
+      DB.config = {
+        institucion: cfg.institucion, periodo: cfg.periodo,
+        metaCert: cfg.meta_cert, actsPorSemestre: cfg.acts_por_semestre,
+        modoAnonimo: cfg.modo_anonimo, logoUrl: cfg.logo_url,
+        vicerrector: cfg.vicerrector,
+        decanos: cfg.decanos || {},
+        certImgUrl: cfg.cert_img_url || ''
+      };
+    }
+    saveDB();
+  } catch(e) {
+    console.error('Error sync:', e);
+  }
+  showLoading(false);
+}
+
+function showLoading(show){
+  let el = document.getElementById('loading-overlay');
+  if(show && !el){
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f)';
+    el.innerHTML = '<div style="font-size:36px;margin-bottom:16px;animation:spin 1s linear infinite">⚙️</div><div style="font-size:14px;font-weight:600">Conectando con la base de datos...</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">Habilidades del Siglo XXI</div>';
+    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
+    document.body.appendChild(el);
+  } else if(!show && el) {
+    el.remove();
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// GUARDAR EN SUPABASE — Override de saveDB
+// ═══════════════════════════════════════════════════════
+const _saveDBLocal = saveDB;
+
+async function saveToSupabase(){
+  try {
+    // Guardar grupos
+    for(const g of DB.grupos){
+      await sbUpsert('grupos', {
+        id: g.id, periodo: g.periodo, sede: g.sede, modalidad: g.modalidad,
+        facultad: g.facultad, programa: g.programa,
+        asignatura_codigo: g.asignatura?.codigo, asignatura_nombre: g.asignatura?.nombre,
+        grupo: g.grupo, fecha_inicio: g.fechaInicio, fecha_fin: g.fechaFin,
+        doc_docente: g.docente?.documento, nombre_docente: g.docente?.nombresApellidos,
+        correo_docente: g.docente?.correo
+      }, 'id');
+
+      // Guardar estudiantes del grupo
+      for(const e of (g.estudiantes||[])){
+        const existe = await sbGet('estudiantes', `?grupo_id=eq.${g.id}&correo=eq.${encodeURIComponent(e.correo)}`);
+        if(!existe || existe.length === 0){
+          await sbPost('estudiantes', {
+            grupo_id: g.id, documento: e.documento, nombres_apellidos: e.nombresApellidos,
+            correo: e.correo, equipo: e.equipo, semestre: e.semestre, grupo_letra: e.grupo
+          });
+        }
+      }
+    }
+
+    // Guardar evaluaciones nuevas
+    for(const ev of DB.evaluaciones){
+      const existe = await sbGet('evaluaciones',
+        `?evaluador_email=eq.${encodeURIComponent(ev.evaluadorEmail)}&evaluado_email=eq.${encodeURIComponent(ev.evaluadoEmail)}&grupo_id=eq.${ev.grupoId}&competencia_idx=eq.${ev.ci}&criterio_idx=eq.${ev.ki}`
+      );
+      if(!existe || existe.length === 0){
+        await sbPost('evaluaciones', {
+          evaluador_email: ev.evaluadorEmail, evaluado_email: ev.evaluadoEmail,
+          grupo_id: ev.grupoId, equipo_num: ev.equipoNum,
+          competencia_idx: ev.ci, criterio_idx: ev.ki, valor: ev.val
+        });
+      }
+    }
+
+    // Guardar instrumentos entrada
+    for(const i of DB.instrEntrada){
+      await sbDelete('instrumento_entrada', `email=eq.${encodeURIComponent(i.email)}&grupo_id=eq.${i.grupoId}`);
+      await sbPost('instrumento_entrada', {email: i.email, grupo_id: i.grupoId, respuestas: i.respuestas});
+    }
+
+    // Guardar instrumentos salida
+    for(const i of DB.instrSalida){
+      await sbDelete('instrumento_salida', `email=eq.${encodeURIComponent(i.email)}&grupo_id=eq.${i.grupoId}`);
+      await sbPost('instrumento_salida', {email: i.email, grupo_id: i.grupoId, respuestas: i.respuestas});
+    }
+
+    // Guardar observaciones
+    for(const o of DB.observaciones){
+      await sbDelete('observaciones', `email=eq.${encodeURIComponent(o.email)}&grupo_id=eq.${o.grupoId}`);
+      await sbPost('observaciones', {email: o.email, rol: o.rol, grupo_id: o.grupoId, texto: o.texto});
+    }
+
+    // Guardar actividades
+    for(const a of DB.actividades){
+      await sbDelete('actividades', `grupo_id=eq.${a.grupoId}&num_actividad=eq.${a.numActividad}`);
+      await sbPost('actividades', {
+        grupo_id: a.grupoId, num_actividad: a.numActividad, nombre: a.nombre,
+        descripcion: a.descripcion, enlace: a.enlace, enlace_texto: a.enlaceTexto
+      });
+    }
+
+    // Guardar config
+    await sbUpsert('config', {
+      id: 1, institucion: DB.config.institucion, periodo: DB.config.periodo,
+      meta_cert: DB.config.metaCert, acts_por_semestre: DB.config.actsPorSemestre,
+      modo_anonimo: DB.config.modoAnonimo, logo_url: DB.config.logoUrl||'',
+      vicerrector: DB.config.vicerrector, decanos: DB.config.decanos||{},
+      cert_img_url: DB.config.certImgUrl||''
+    }, 'id');
+
+  } catch(e){
+    console.error('Error guardando en Supabase:', e);
+  }
+  // También guardar local como respaldo
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+}
+
+// Override saveDB para que guarde en Supabase Y local
+function saveDB(){
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+  saveToSupabase().catch(console.error);
+}
+
+// ═══════════════════════════════════════════════════════
+// INICIALIZAR — Sincronizar al cargar
+// ═══════════════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  // Primero cargar local (instantáneo)
+  const local = localStorage.getItem('h21_v2');
+  if(local){ try{ Object.assign(DB, JSON.parse(local)); }catch(e){} }
+  // Luego sincronizar con Supabase
+  await syncFromSupabase();
+});
+
 </script>
 </body>
 </html>
