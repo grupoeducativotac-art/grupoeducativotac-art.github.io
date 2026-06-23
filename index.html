@@ -2041,43 +2041,7 @@ function showLoading(show){
     el.id = 'loading-overlay';
     el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f)';
     el.innerHTML = '<div style="font-size:36px;margin-bottom:16px;animation:spin 1s linear infinite">⚙️</div><div style="font-size:14px;font-weight:600">Conectando con la base de datos...</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">Habilidades del Siglo XXI</div>';
-    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}
-/* BUSCADOR GLOBAL */
-.global-search-wrap{position:relative;flex:1;max-width:320px;margin:0 12px}
-.search-dropdown{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:#1E293B;border:1px solid rgba(255,255,255,.12);border-radius:var(--r);z-index:500;max-height:360px;overflow-y:auto;box-shadow:var(--sh)}
-.search-dropdown.open{display:block}
-.search-item{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:.5px solid rgba(255,255,255,.06);transition:background .15s}
-.search-item:hover{background:rgba(255,255,255,.08)}
-.search-item:last-child{border-bottom:none}
-.search-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px;font-weight:700;color:#fff}
-.search-info .si-name{color:#fff;font-size:12px;font-weight:600}
-.search-info .si-sub{color:rgba(255,255,255,.45);font-size:10px;margin-top:1px}
-.search-empty{padding:20px;text-align:center;color:rgba(255,255,255,.35);font-size:12px}
-.search-section{padding:6px 14px 4px;color:rgba(255,255,255,.3);font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
-
-/* MODO VISTA COMO (ROL VIEWER) */
-.role-viewer-bar{background:linear-gradient(90deg,#F5A623,#E65100);padding:8px 20px;display:flex;align-items:center;gap:12px;font-size:12px;color:#fff;font-weight:600;flex-shrink:0}
-.role-viewer-bar i{font-size:16px}
-.role-viewer-bar button{margin-left:auto;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 14px;color:#fff;font-size:11px;cursor:pointer;font-family:var(--f)}
-
-/* FILTROS DE TABLA */
-.table-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
-.tf-input{border:1.5px solid var(--g200);border-radius:var(--r);padding:7px 11px;font-size:12px;color:var(--g800);outline:none;font-family:var(--f);background:#fff;transition:border-color .2s}
-.tf-input:focus{border-color:var(--ac)}
-.tf-select{border:1.5px solid var(--g200);border-radius:var(--r);padding:7px 11px;font-size:12px;color:var(--g800);outline:none;font-family:var(--f);background:#fff}
-
-/* FECHAS EDITABLES */
-.fecha-inline{border:1.5px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--g700);font-family:var(--f);outline:none;width:120px}
-.fecha-inline:focus{border-color:var(--ac)}
-
-/* PERIODOS */
-.periodo-card{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
-.periodo-card.activo{border-color:var(--su);background:var(--sl)}
-.periodo-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700}
-.pb-activo{background:#DCFCE7;color:#166534}
-.pb-cerrado{background:var(--g100);color:var(--g500)}
-
-</style>');
+    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
     document.body.appendChild(el);
   } else if(!show && el) {
     el.remove();
