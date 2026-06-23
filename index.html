@@ -945,73 +945,91 @@ function procesarExcel(file,rol){
 }
 
 function procesarFilas(rows){
+  // Procesador inteligente para Excel de Unipamplona con celdas fusionadas
+  // Funciona tanto con formato nativo (índices) como con encabezados estándar
   const map={};
-  // Manejar el formato del Excel de Unipamplona (con celdas fusionadas)
-  let lastPeriodo='',lastSede='',lastModalidad='',lastFacultad='',lastPrograma='';
-  let lastCodAsig='',lastNomAsig='',lastSedeAsig='';
-  let lastDocDoc='',lastNomDoc='',lastCorrDoc='';
+  let ctx={periodo:'',sede:'',modalidad:'',facultad:'',programa:'',
+    codAsig:'',nomAsig:'',sedeAsig:'',docDoc:'',nomDoc:'',corrDoc:''};
 
   rows.forEach(row=>{
-    // Actualizar contexto si la fila tiene datos
-    const periodo=String(row['PERIODO ACADEMICO']||row['PERIODO_ACADEMICO']||'').trim()||lastPeriodo;
-    const sede=String(row['SEDE']||'').trim()||lastSede;
-    const modalidad=String(row['MODALIDAD']||'').trim()||lastModalidad;
-    const facultad=String(row['FACULTAD']||'').trim()||lastFacultad;
-    const programa=String(row['PROGRAMA']||'').trim()||lastPrograma;
-
-    // Asignatura
-    const codA=String(row['CODIGO']||row['COD. ASIGNATURA']||row['CODIGO ASIGNATURA']||'').trim()||lastCodAsig;
-    const nomA=String(row['NOMBRE']||row['NOMBRE ASIGNATURA']||'').trim()||lastNomAsig;
-    const sedeA=String(row['SEDE']||'').trim()||lastSedeAsig;
-
-    // Docente
-    const docD=String(row['DOCUMENTO']||row['DOC. DOCENTE']||'').trim()||lastDocDoc;
-    const nomD=String(row['NOMBRES Y APELLIDOS']||row['NOMBRES DOCENTE']||'').trim()||lastNomDoc;
-    const corrD=String(row['CORREO']||row['CORREO DOCENTE']||'').trim().toLowerCase()||lastCorrDoc;
-
-    // Estudiante - buscar en columnas L,M,N (índices)
     const vals=Object.values(row);
-    const docE=String(row['DOCUMENTO_1']||row['DOC. ESTUDIANTE']||vals[11]||'').trim();
-    const nomE=String(row['NOMBRES Y APELLIDOS_1']||row['NOMBRES ESTUDIANTE']||vals[12]||'').trim();
-    const corrE=String(row['CORREO_1']||row['CORREO ESTUDIANTE']||vals[13]||'').trim().toLowerCase();
-    const equipo=String(row['EQUIPO']||vals[13]||'').trim();
-    const semestre=String(row['SEMESTRE']||'').trim();
-    const grupo=String(row['GRUPO']||'').trim()||'A';
+    // Detectar si es formato con encabezados (tiene claves de texto) o formato nativo (índices)
+    const hasHeaders=Object.keys(row).some(k=>isNaN(k));
+    
+    let periodo,sede,modalidad,facultad,programa,codA,nomA,docD,nomD,corrD,docE,nomE,corrE,equipo,semestre,grupo;
+    
+    if(hasHeaders){
+      // Formato con encabezados estándar
+      periodo=String(row['PERIODO ACADEMICO']||row['PERIODO_ACADEMICO']||vals[0]||'').trim();
+      sede=String(row['SEDE']||vals[1]||'').trim();
+      modalidad=String(row['MODALIDAD']||vals[2]||'').trim();
+      facultad=String(row['FACULTAD']||vals[3]||'').trim();
+      programa=String(row['PROGRAMA']||vals[4]||'').trim();
+      codA=String(row['CODIGO']||row['COD. ASIGNATURA']||row['CODIGO ASIGNATURA']||vals[5]||'').trim();
+      nomA=String(row['NOMBRE']||row['NOMBRE ASIGNATURA']||vals[6]||'').trim().replace(/^	/,'').trim();
+      docD=String(row['DOCUMENTO']||row['DOC. DOCENTE']||vals[8]||'').trim();
+      nomD=String(row['NOMBRES Y APELLIDOS']||row['NOMBRES DOCENTE']||vals[9]||'').trim();
+      corrD=String(row['CORREO']||row['CORREO DOCENTE']||vals[10]||'').trim().toLowerCase();
+      // Estudiante — puede estar en cols 11,12,13 o con sufijo _1
+      docE=String(row['DOCUMENTO_1']||row['DOC. ESTUDIANTE']||vals[11]||'').trim();
+      nomE=String(row['NOMBRES Y APELLIDOS_1']||row['NOMBRES ESTUDIANTE']||vals[12]||'').trim();
+      corrE=String(row['CORREO_1']||row['CORREO ESTUDIANTE']||vals[13]||'').trim().toLowerCase();
+      equipo=String(row['EQUIPO']||row['EQUIPO_1']||'').trim();
+      semestre=String(row['SEMESTRE']||'').trim();
+      grupo=String(row['GRUPO']||'').trim()||'A';
+    } else {
+      // Formato por índice
+      periodo=String(vals[0]||'').trim();
+      sede=String(vals[1]||'').trim();
+      modalidad=String(vals[2]||'').trim();
+      facultad=String(vals[3]||'').trim();
+      programa=String(vals[4]||'').trim();
+      codA=String(vals[5]||'').trim();
+      nomA=String(vals[6]||'').trim().replace(/^	/,'').trim();
+      docD=String(vals[8]||'').trim();
+      nomD=String(vals[9]||'').trim();
+      corrD=String(vals[10]||'').trim().toLowerCase();
+      docE=String(vals[11]||'').trim();
+      nomE=String(vals[12]||'').trim();
+      corrE=String(vals[13]||'').trim().toLowerCase();
+      equipo=''; semestre=''; grupo='A';
+    }
 
-    if(periodo) lastPeriodo=periodo;
-    if(sede) lastSede=sede;
-    if(modalidad) lastModalidad=modalidad;
-    if(facultad) lastFacultad=facultad;
-    if(programa) lastPrograma=programa;
-    if(codA) lastCodAsig=codA;
-    if(nomA) lastNomAsig=nomA;
-    if(corrD) lastCorrDoc=corrD;
-    if(nomD) lastNomDoc=nomD;
-    if(docD) lastDocDoc=docD;
+    // Actualizar contexto con valores no vacíos (manejo de celdas fusionadas)
+    if(periodo) ctx.periodo=periodo;
+    if(sede) ctx.sede=sede;
+    if(modalidad) ctx.modalidad=modalidad;
+    if(facultad) ctx.facultad=facultad;
+    if(programa) ctx.programa=programa;
+    if(codA) ctx.codAsig=codA;
+    if(nomA) ctx.nomAsig=nomA;
+    if(docD) ctx.docDoc=docD;
+    if(nomD) ctx.nomDoc=nomD;
+    if(corrD) ctx.corrDoc=corrD;
 
-    if(!corrD||!lastNomAsig) return;
-    const key=`${lastCodAsig}_${lastCorrDoc}_${grupo}`;
+    // Saltar si no hay datos de estudiante o asignatura
+    if(!corrE||!nomE||!ctx.nomAsig||!ctx.corrDoc) return;
+    // Saltar filas de encabezado
+    if(corrE.includes('correo')||nomE.toUpperCase().includes('NOMBRES')) return;
+
+    const key=`${ctx.codAsig}_${ctx.corrDoc}`;
     if(!map[key]){
       map[key]={
-        id:uid(),periodo:lastPeriodo,sede:lastSede,modalidad:lastModalidad,
-        facultad:lastFacultad,programa:lastPrograma,
-        asignatura:{codigo:String(lastCodAsig),nombre:lastNomAsig.replace(/^\t/,'').trim(),sede:lastSede},
-        grupo,fechaInicio:row['FECHA INICIO']||row['FECHA_INICIO']||'',
-        fechaFin:row['FECHA FIN']||row['FECHA_FIN']||'',
-        docente:{documento:String(lastDocDoc),nombresApellidos:lastNomDoc,correo:lastCorrDoc,
+        id:uid(),periodo:ctx.periodo,sede:ctx.sede,modalidad:ctx.modalidad,
+        facultad:ctx.facultad,programa:ctx.programa,
+        asignatura:{codigo:ctx.codAsig,nombre:ctx.nomAsig},
+        grupo:grupo||'A',fechaInicio:'',fechaFin:'',
+        docente:{documento:ctx.docDoc,nombresApellidos:ctx.nomDoc,correo:ctx.corrDoc,
           get pass(){return String(this.documento).slice(-4);}},
         estudiantes:[]
       };
     }
-    if(corrE&&nomE){
-      const existe=map[key].estudiantes.find(e=>e.correo===corrE);
-      if(!existe){
-        map[key].estudiantes.push({
-          documento:String(docE),nombresApellidos:nomE,correo:corrE,
-          equipo:equipo||'',semestre,grupo,
-          get pass(){return String(this.documento).slice(-4);}
-        });
-      }
+    if(!map[key].estudiantes.find(e=>e.correo===corrE)){
+      map[key].estudiantes.push({
+        documento:docE,nombresApellidos:nomE,correo:corrE,
+        equipo:equipo||'',semestre,grupo,
+        get pass(){return String(this.documento).slice(-4);}
+      });
     }
   });
   const nuevos=Object.values(map).filter(g=>g.estudiantes.length>0);
