@@ -306,6 +306,90 @@ table tbody tr:hover td{background:var(--g50)}
 .pb-activo{background:#DCFCE7;color:#166534}
 .pb-cerrado{background:var(--g100);color:var(--g500)}
 
+
+/* ═══════════════════════════════════════
+   PANTALLAS DE BIENVENIDA
+═══════════════════════════════════════ */
+.welcome-wrap{padding:28px;max-width:960px;margin:0 auto;width:100%}
+.welcome-hero{background:linear-gradient(135deg,var(--p) 0%,var(--pl) 100%);border-radius:var(--rl);padding:28px 32px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.welcome-hero-text h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.welcome-hero-text p{font-size:13px;opacity:.8;margin-bottom:0}
+.welcome-hero-meta{font-size:11px;opacity:.6;margin-top:8px;display:flex;align-items:center;gap:12px}
+.welcome-hero-meta span{display:flex;align-items:center;gap:4px}
+.welcome-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;flex-shrink:0}
+
+.welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.welcome-grid.full{grid-template-columns:1fr}
+@media(max-width:768px){.welcome-grid{grid-template-columns:1fr}}
+
+.wcard{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.wcard-title{font-size:13px;font-weight:700;color:var(--g700);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.wcard-title i{font-size:16px;color:var(--ac)}
+
+/* Stats mini */
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.msc{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:14px;text-align:center}
+.msc .mv{font-size:24px;font-weight:800;color:var(--g800);line-height:1}
+.msc .ml{font-size:11px;color:var(--g500);margin-top:5px;font-weight:500}
+.msc .mi{font-size:18px;margin-bottom:6px}
+.msc.ac .mv,.msc.ac .mi{color:var(--ac)}
+.msc.go .mv,.msc.go .mi{color:var(--go)}
+.msc.su .mv,.msc.su .mi{color:var(--su)}
+.msc.pr .mv,.msc.pr .mi{color:var(--p)}
+
+/* Accesos rápidos */
+.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.qa-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);cursor:pointer;transition:all .2s;background:#fff;text-align:left;font-family:var(--f)}
+.qa-btn:hover{border-color:var(--ac);background:rgba(233,69,96,.04);transform:translateY(-1px)}
+.qa-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.qa-text{font-size:12px;font-weight:600;color:var(--g700)}
+.qa-sub{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* Actividad reciente */
+.activity-feed{display:flex;flex-direction:column;gap:0}
+.af-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--g100)}
+.af-item:last-child{border-bottom:none}
+.af-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.af-text{font-size:12px;color:var(--g700);line-height:1.4}
+.af-time{font-size:10px;color:var(--g400);margin-top:2px}
+
+/* Progreso estudiante */
+.progress-steps{display:flex;flex-direction:column;gap:8px}
+.ps-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--g50);transition:all .2s}
+.ps-item.done{border-color:var(--su);background:var(--sl)}
+.ps-item.active{border-color:var(--ac);background:rgba(233,69,96,.04)}
+.ps-item.locked{opacity:.5}
+.ps-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:700}
+.ps-item.done .ps-icon{background:var(--su);color:#fff}
+.ps-item.active .ps-icon{background:var(--ac);color:#fff}
+.ps-item.locked .ps-icon{background:var(--g200);color:var(--g400)}
+.ps-label{font-size:13px;font-weight:600;color:var(--g800)}
+.ps-sub{font-size:11px;color:var(--g500);margin-top:1px}
+.ps-arrow{margin-left:auto;color:var(--g300);font-size:16px}
+.ps-item.active .ps-arrow{color:var(--ac)}
+
+/* Alertas docente */
+.alert-mini{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--r);background:#FEE2E2;border:1px solid #FECACA;margin-bottom:7px;font-size:12px;color:#991B1B}
+.alert-mini:last-child{margin-bottom:0}
+.success-mini{background:var(--sl);border-color:#86EFAC;color:#166534}
+
+/* Cert progress bar */
+.cert-prog-wrap{margin-bottom:16px}
+.cert-prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--g800)}
+.cert-prog-sub{font-size:11px;color:var(--g500);font-weight:400}
+.cert-big-bar{height:14px;background:var(--g100);border-radius:20px;overflow:hidden}
+.cert-big-fill{height:14px;border-radius:20px;background:linear-gradient(90deg,var(--p),var(--ac));transition:width .6s}
+.cert-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--g400);margin-top:5px}
+
+/* Actividad card en bienvenida */
+.act-welcome{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--r);padding:14px;color:#fff;margin-bottom:12px}
+.act-welcome h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.act-welcome p{font-size:11px;opacity:.75;line-height:1.5}
+
+/* Btn continuar */
+.btn-continuar{width:100%;background:var(--ac);color:#fff;border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
+.btn-continuar:hover{background:var(--acd);transform:translateY(-1px)}
+
 </style>
 </head>
 <body>
@@ -355,7 +439,8 @@ table tbody tr:hover td{background:var(--g50)}
   <div class="app-layout">
     <div class="sidebar" id="a-side">
       <div class="sb-section">Principal</div>
-      <div class="sb-item act go" onclick="aN('dashboard')" id="sa-dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+      <div class="sb-item act go" onclick="aN('bienvenida')" id="sa-bienvenida"><i class="ti ti-home"></i> Inicio</div>
+      <div class="sb-item" onclick="aN('dashboard')" id="sa-dashboard"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
       <div class="sb-item" onclick="aN('grupos')" id="sa-grupos"><i class="ti ti-users-group"></i> Grupos</div>
       <div class="sb-item" onclick="aN('carga')" id="sa-carga"><i class="ti ti-file-upload"></i> Carga masiva</div>
       <div class="sb-section">Gestión</div>
@@ -388,7 +473,8 @@ table tbody tr:hover td{background:var(--g50)}
   <div class="app-layout">
     <div class="sidebar">
       <div class="sb-section">Mi espacio</div>
-      <div class="sb-item act pu" onclick="dN('migrupo')" id="sd-migrupo"><i class="ti ti-users"></i> Mi grupo</div>
+      <div class="sb-item act pu" onclick="dN('bienvenida')" id="sd-bienvenida"><i class="ti ti-home"></i> Inicio</div>
+      <div class="sb-item" onclick="dN('migrupo')" id="sd-migrupo"><i class="ti ti-users"></i> Mi grupo</div>
       <div class="sb-item" onclick="dN('actividades')" id="sd-actividades"><i class="ti ti-flag"></i> Actividades</div>
       <div class="sb-item" onclick="dN('equipos')" id="sd-equipos"><i class="ti ti-arrows-shuffle"></i> Equipos</div>
       <div class="sb-item" onclick="dN('carga')" id="sd-carga"><i class="ti ti-file-upload"></i> Cargar estudiantes</div>
@@ -722,7 +808,7 @@ q('l-email').addEventListener('keydown',e=>{if(e.key==='Enter')q('l-pass').focus
 function launchAdmin(){
   q('a-sub').textContent=APP.session.nombre;
   showScreen('s-admin');
-  aN('dashboard');
+  aN('bienvenida');
 }
 
 function aN(sec){
@@ -732,6 +818,7 @@ function aN(sec){
   destroyAll();
   const m=q('a-main');
   const renders={
+    bienvenida:rAdminBienvenida,
     dashboard:rAdminDash,grupos:rAdminGrupos,carga:rAdminCarga,
     estudiantes:rAdminEstudiantes,equipos:rAdminEquipos,
     reportes:rAdminReportes,certificados:rAdminCerts,
@@ -1399,7 +1486,7 @@ function launchDocente(){
   q('d-sub').textContent=g?`${g.asignatura?.nombre} · ${g.programa}`:'Mi grupo';
   const alerts=getAlertas();
   const badge=q('d-alert-badge');if(badge)badge.textContent=alerts.length;
-  showScreen('s-doc');dN('migrupo');
+  showScreen('s-doc');dN('bienvenida');
 }
 
 function dN(sec){
@@ -1408,7 +1495,7 @@ function dN(sec){
   const el=q('sd-'+sec);if(el){el.classList.add('act','pu');}
   destroyAll();
   const m=q('d-main');
-  const renders={migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion};
+  const renders={bienvenida:rDocenteBienvenida,migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion};
   m.innerHTML=(renders[sec]||rDocGrupo)();
   if(sec==='reporte')setTimeout(()=>renderDocCharts(),100);
 }
@@ -1624,9 +1711,16 @@ function launchEstudiante(){
   const est=g?.estudiantes?.find(e=>e.correo===APP.session.email);
   q('e-name').textContent=APP.session.nombre;
   q('e-sub').textContent=g?`${g.asignatura?.nombre} · Equipo ${est?.equipo||'—'}`:'Evaluación';
-  APP.ratings={};APP.instrE={};APP.instrS={};APP.evalStep=0;APP.curComp=0;
+  APP.ratings={};APP.instrE={};APP.instrS={};APP.curComp=0;
   getAllPersonas().forEach(p=>{APP.ratings[p.correo]={};COMPETENCIAS.forEach((_,ci)=>{APP.ratings[p.correo][ci]={};});});
-  showScreen('s-est');renderStepper();goStep(0);
+  showScreen('s-est');
+  // Mostrar bienvenida primero
+  renderBienvenidaEst();
+}
+
+function renderBienvenidaEst(){
+  q('e-stepper').innerHTML='';
+  q('e-body').innerHTML=rEstudianteBienvenida();
 }
 
 const STEPS=[
@@ -2041,7 +2135,91 @@ function showLoading(show){
     el.id = 'loading-overlay';
     el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f)';
     el.innerHTML = '<div style="font-size:36px;margin-bottom:16px;animation:spin 1s linear infinite">⚙️</div><div style="font-size:14px;font-weight:600">Conectando con la base de datos...</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">Habilidades del Siglo XXI</div>';
-    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
+    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}
+/* ═══════════════════════════════════════
+   PANTALLAS DE BIENVENIDA
+═══════════════════════════════════════ */
+.welcome-wrap{padding:28px;max-width:960px;margin:0 auto;width:100%}
+.welcome-hero{background:linear-gradient(135deg,var(--p) 0%,var(--pl) 100%);border-radius:var(--rl);padding:28px 32px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.welcome-hero-text h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.welcome-hero-text p{font-size:13px;opacity:.8;margin-bottom:0}
+.welcome-hero-meta{font-size:11px;opacity:.6;margin-top:8px;display:flex;align-items:center;gap:12px}
+.welcome-hero-meta span{display:flex;align-items:center;gap:4px}
+.welcome-avatar{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;flex-shrink:0}
+
+.welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.welcome-grid.full{grid-template-columns:1fr}
+@media(max-width:768px){.welcome-grid{grid-template-columns:1fr}}
+
+.wcard{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.wcard-title{font-size:13px;font-weight:700;color:var(--g700);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.wcard-title i{font-size:16px;color:var(--ac)}
+
+/* Stats mini */
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.msc{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:14px;text-align:center}
+.msc .mv{font-size:24px;font-weight:800;color:var(--g800);line-height:1}
+.msc .ml{font-size:11px;color:var(--g500);margin-top:5px;font-weight:500}
+.msc .mi{font-size:18px;margin-bottom:6px}
+.msc.ac .mv,.msc.ac .mi{color:var(--ac)}
+.msc.go .mv,.msc.go .mi{color:var(--go)}
+.msc.su .mv,.msc.su .mi{color:var(--su)}
+.msc.pr .mv,.msc.pr .mi{color:var(--p)}
+
+/* Accesos rápidos */
+.quick-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.qa-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--g200);border-radius:var(--r);cursor:pointer;transition:all .2s;background:#fff;text-align:left;font-family:var(--f)}
+.qa-btn:hover{border-color:var(--ac);background:rgba(233,69,96,.04);transform:translateY(-1px)}
+.qa-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.qa-text{font-size:12px;font-weight:600;color:var(--g700)}
+.qa-sub{font-size:10px;color:var(--g400);margin-top:1px}
+
+/* Actividad reciente */
+.activity-feed{display:flex;flex-direction:column;gap:0}
+.af-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:.5px solid var(--g100)}
+.af-item:last-child{border-bottom:none}
+.af-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.af-text{font-size:12px;color:var(--g700);line-height:1.4}
+.af-time{font-size:10px;color:var(--g400);margin-top:2px}
+
+/* Progreso estudiante */
+.progress-steps{display:flex;flex-direction:column;gap:8px}
+.ps-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--g200);background:var(--g50);transition:all .2s}
+.ps-item.done{border-color:var(--su);background:var(--sl)}
+.ps-item.active{border-color:var(--ac);background:rgba(233,69,96,.04)}
+.ps-item.locked{opacity:.5}
+.ps-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:700}
+.ps-item.done .ps-icon{background:var(--su);color:#fff}
+.ps-item.active .ps-icon{background:var(--ac);color:#fff}
+.ps-item.locked .ps-icon{background:var(--g200);color:var(--g400)}
+.ps-label{font-size:13px;font-weight:600;color:var(--g800)}
+.ps-sub{font-size:11px;color:var(--g500);margin-top:1px}
+.ps-arrow{margin-left:auto;color:var(--g300);font-size:16px}
+.ps-item.active .ps-arrow{color:var(--ac)}
+
+/* Alertas docente */
+.alert-mini{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--r);background:#FEE2E2;border:1px solid #FECACA;margin-bottom:7px;font-size:12px;color:#991B1B}
+.alert-mini:last-child{margin-bottom:0}
+.success-mini{background:var(--sl);border-color:#86EFAC;color:#166534}
+
+/* Cert progress bar */
+.cert-prog-wrap{margin-bottom:16px}
+.cert-prog-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--g800)}
+.cert-prog-sub{font-size:11px;color:var(--g500);font-weight:400}
+.cert-big-bar{height:14px;background:var(--g100);border-radius:20px;overflow:hidden}
+.cert-big-fill{height:14px;border-radius:20px;background:linear-gradient(90deg,var(--p),var(--ac));transition:width .6s}
+.cert-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--g400);margin-top:5px}
+
+/* Actividad card en bienvenida */
+.act-welcome{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--r);padding:14px;color:#fff;margin-bottom:12px}
+.act-welcome h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.act-welcome p{font-size:11px;opacity:.75;line-height:1.5}
+
+/* Btn continuar */
+.btn-continuar{width:100%;background:var(--ac);color:#fff;border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
+.btn-continuar:hover{background:var(--acd);transform:translateY(-1px)}
+
+</style>');
     document.body.appendChild(el);
   } else if(!show && el) {
     el.remove();
@@ -2414,6 +2592,342 @@ function addPeriodosSidebar(){
     item.innerHTML='<i class="ti ti-calendar"></i> Períodos';
     side.appendChild(item);
   }
+}
+
+
+// ═══════════════════════════════════════════════════════
+// PANTALLAS DE BIENVENIDA
+// ═══════════════════════════════════════════════════════
+
+// ── ADMIN ──────────────────────────────────────────────
+function rAdminBienvenida(){
+  const tG=DB.grupos.length;
+  const tE=DB.grupos.reduce((a,g)=>a+(g.estudiantes?.length||0),0);
+  const tD=new Set(DB.grupos.map(g=>g.docente?.correo)).size;
+  const tEv=DB.evaluaciones.length;
+  const hoy=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const periodo=DB.config?.periodo||'—';
+
+  // Logs recientes
+  const logsRecientes=DB.logs.slice(-5).reverse();
+  const feedHtml=logsRecientes.length>0
+    ? logsRecientes.map(l=>`<div class="af-item">
+        <div class="af-dot" style="background:var(--ac)"></div>
+        <div><div class="af-text">${l.accion}</div>
+        <div class="af-time">${l.email} · ${fmt(l.fecha)}</div></div>
+      </div>`).join('')
+    : '<div style="color:var(--g400);font-size:12px;padding:8px 0">Sin actividad reciente</div>';
+
+  // Alertas
+  const alertas=getAlertas();
+
+  return `<div class="welcome-wrap">
+
+    <!-- HERO -->
+    <div class="welcome-hero">
+      <div class="welcome-hero-text">
+        <h1>¡Bienvenido, ${APP.session.nombre.split(' ')[0]}! 👋</h1>
+        <p>Panel de administración — Habilidades del Siglo XXI</p>
+        <div class="welcome-hero-meta">
+          <span><i class="ti ti-calendar"></i> ${hoy}</span>
+          <span><i class="ti ti-circle-dot"></i> Período activo: ${periodo}</span>
+        </div>
+      </div>
+      <div class="welcome-avatar">${ini(APP.session.nombre)}</div>
+    </div>
+
+    <!-- MINI STATS -->
+    <div class="mini-stats">
+      <div class="msc ac"><div class="mi"><i class="ti ti-users-group"></i></div><div class="mv">${tG}</div><div class="ml">Grupos</div></div>
+      <div class="msc pr"><div class="mi"><i class="ti ti-user-graduate"></i></div><div class="mv">${tE}</div><div class="ml">Estudiantes</div></div>
+      <div class="msc go"><div class="mi"><i class="ti ti-user-check"></i></div><div class="mv">${tD}</div><div class="ml">Docentes</div></div>
+      <div class="msc su"><div class="mi"><i class="ti ti-clipboard-check"></i></div><div class="mv">${tEv}</div><div class="ml">Evaluaciones</div></div>
+    </div>
+
+    <div class="welcome-grid">
+      <!-- ACCESOS RÁPIDOS -->
+      <div class="wcard">
+        <div class="wcard-title"><i class="ti ti-bolt"></i> Accesos rápidos</div>
+        <div class="quick-actions">
+          <button class="qa-btn" onclick="aN('carga')">
+            <div class="qa-icon" style="background:#EEF2FF"><i class="ti ti-file-upload" style="color:#1565C0"></i></div>
+            <div><div class="qa-text">Cargar grupos</div><div class="qa-sub">Importar Excel</div></div>
+          </button>
+          <button class="qa-btn" onclick="aN('reportes')">
+            <div class="qa-icon" style="background:#F0FDF9"><i class="ti ti-chart-bar" style="color:#00695C"></i></div>
+            <div><div class="qa-text">Ver reportes</div><div class="qa-sub">Dashboard completo</div></div>
+          </button>
+          <button class="qa-btn" onclick="aN('equipos')">
+            <div class="qa-icon" style="background:#FFF7ED"><i class="ti ti-arrows-shuffle" style="color:#E65100"></i></div>
+            <div><div class="qa-text">Organizar equipos</div><div class="qa-sub">Aleatorio o manual</div></div>
+          </button>
+          <button class="qa-btn" onclick="aN('certificados')">
+            <div class="qa-icon" style="background:#FFF8E7"><i class="ti ti-certificate" style="color:#F5A623"></i></div>
+            <div><div class="qa-text">Certificados</div><div class="qa-sub">Ver progreso</div></div>
+          </button>
+          <button class="qa-btn" onclick="aN('estudiantes')">
+            <div class="qa-icon" style="background:#F3E8FF"><i class="ti ti-users" style="color:#7C3AED"></i></div>
+            <div><div class="qa-text">Estudiantes</div><div class="qa-sub">Gestionar y filtrar</div></div>
+          </button>
+          <button class="qa-btn" onclick="aN('config')">
+            <div class="qa-icon" style="background:var(--g100)"><i class="ti ti-settings" style="color:var(--g500)"></i></div>
+            <div><div class="qa-text">Configuración</div><div class="qa-sub">Sistema y períodos</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- ACTIVIDAD RECIENTE + ALERTAS -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+        ${alertas.length>0?`<div class="wcard">
+          <div class="wcard-title"><i class="ti ti-alert-triangle" style="color:var(--da)"></i> Alertas activas (${alertas.length})</div>
+          ${alertas.slice(0,3).map(a=>`<div class="alert-mini"><i class="ti ti-alert-circle"></i><span><b>${a.nombre}</b> — ${a.msg}</span></div>`).join('')}
+          ${alertas.length>3?`<div style="font-size:11px;color:var(--g400);margin-top:6px">+${alertas.length-3} alertas más → <span style="color:var(--ac);cursor:pointer" onclick="aN('reportes')">Ver todas</span></div>`:''}
+        </div>`:'<div class="wcard"><div class="wcard-title"><i class="ti ti-circle-check" style="color:var(--su)"></i> Sin alertas</div><div class="success-mini"><i class="ti ti-check"></i> Todos los estudiantes tienen buen desempeño</div></div>'}
+
+        <div class="wcard">
+          <div class="wcard-title"><i class="ti ti-history"></i> Actividad reciente</div>
+          <div class="activity-feed">${feedHtml}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTADO GRUPOS -->
+    ${tG>0?`<div class="wcard">
+      <div class="wcard-title"><i class="ti ti-users-group"></i> Estado de grupos activos</div>
+      <div class="tw"><table><thead><tr><th>Asignatura</th><th>Docente</th><th>Estudiantes</th><th>Evaluaciones</th><th>Progreso</th></tr></thead>
+      <tbody>${DB.grupos.map(g=>{
+        const evs=DB.evaluaciones.filter(e=>e.grupoId===g.id).length;
+        const maxEvs=g.estudiantes.length*COMPETENCIAS.length*5;
+        const pct=maxEvs>0?Math.round(evs/maxEvs*100):0;
+        return `<tr>
+          <td><b>${g.asignatura?.nombre||'—'}</b><br><small style="color:var(--g400)">${g.periodo}</small></td>
+          <td style="font-size:11px">${g.docente?.nombresApellidos||'—'}</td>
+          <td><span class="badge bg-in">${g.estudiantes.length}</span></td>
+          <td>${evs}/${maxEvs}</td>
+          <td style="min-width:120px">
+            <div style="height:6px;background:var(--g100);border-radius:3px;overflow:hidden">
+              <div style="height:6px;background:${pct>=80?'var(--su)':pct>=40?'var(--go)':'var(--ac)'};border-radius:3px;width:${pct}%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--g400);margin-top:3px">${pct}% completado</div>
+          </td>
+        </tr>`;
+      }).join('')}</tbody></table></div>
+    </div>`:''}
+  </div>`;
+}
+
+// ── DOCENTE ─────────────────────────────────────────────
+function rDocenteBienvenida(){
+  const g=getDocGrupo();
+  const nombre=APP.session.nombre.split(' ')[0];
+  if(!g) return `<div class="welcome-wrap">
+    <div class="welcome-hero">
+      <div class="welcome-hero-text"><h1>¡Bienvenido/a, ${nombre}! 👋</h1><p>No tiene grupos asignados aún.</p></div>
+      <div class="welcome-avatar">${ini(APP.session.nombre)}</div>
+    </div>
+    <div class="wcard"><div class="wcard-title"><i class="ti ti-file-upload"></i> Primeros pasos</div>
+    <p style="color:var(--g500);font-size:13px;margin-bottom:16px">Para comenzar, cargue el Excel con sus estudiantes.</p>
+    <button class="btn btn-p" onclick="dN('carga')"><i class="ti ti-file-upload"></i> Cargar mi grupo</button></div>
+  </div>`;
+
+  const evsDone=g.estudiantes.filter(e=>
+    DB.evaluaciones.filter(ev=>ev.evaluadorEmail===e.correo&&ev.grupoId===g.id).length>=(COMPETENCIAS.length*5*Math.max(1,g.estudiantes.filter(s=>s.equipo===e.equipo).length))
+  ).length;
+  const pctEv=g.estudiantes.length>0?Math.round(evsDone/g.estudiantes.length*100):0;
+  const act=DB.actividades.find(a=>a.grupoId===g.id);
+  const alertas=getAlertas().filter(a=>g.estudiantes.find(e=>e.nombresApellidos===a.nombre));
+
+  return `<div class="welcome-wrap">
+    <div class="welcome-hero">
+      <div class="welcome-hero-text">
+        <h1>¡Bienvenida/o, ${nombre}! 👩‍🏫</h1>
+        <p>${g.asignatura?.nombre} · ${g.programa}</p>
+        <div class="welcome-hero-meta">
+          <span><i class="ti ti-users"></i> ${g.estudiantes.length} estudiantes</span>
+          <span><i class="ti ti-circle-dot"></i> Período ${g.periodo}</span>
+          ${g.fechaInicio?`<span><i class="ti ti-calendar"></i> ${fmt(g.fechaInicio)} → ${fmt(g.fechaFin)}</span>`:''}
+        </div>
+      </div>
+      <div class="welcome-avatar">${ini(APP.session.nombre)}</div>
+    </div>
+
+    <div class="welcome-grid">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- PROGRESO GRUPO -->
+        <div class="wcard">
+          <div class="wcard-title"><i class="ti ti-chart-line"></i> Progreso de mi grupo</div>
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:6px">
+              <span>Evaluaciones completadas</span><span style="font-weight:700">${evsDone}/${g.estudiantes.length}</span>
+            </div>
+            <div style="height:10px;background:var(--g100);border-radius:20px;overflow:hidden">
+              <div style="height:10px;background:${pctEv>=80?'var(--su)':pctEv>=40?'var(--go)':'var(--ac)'};border-radius:20px;width:${pctEv}%;transition:width .5s"></div>
+            </div>
+            <div style="font-size:10px;color:var(--g400);margin-top:4px">${pctEv}% del grupo ha completado la evaluación</div>
+          </div>
+          ${act?`<div class="act-welcome"><h4><i class="ti ti-flag"></i> ${act.nombre}</h4><p>${act.descripcion||''}</p></div>`:'<div style="font-size:12px;color:var(--g400);padding:8px;background:var(--g50);border-radius:var(--r)"><i class="ti ti-flag"></i> Sin actividad configurada aún</div>'}
+        </div>
+
+        <!-- ALERTAS -->
+        <div class="wcard">
+          <div class="wcard-title"><i class="ti ti-alert-triangle" style="color:${alertas.length>0?'var(--da)':'var(--su)'}"></i> ${alertas.length>0?`Alertas (${alertas.length})`:'Sin alertas'}</div>
+          ${alertas.length>0
+            ? alertas.slice(0,4).map(a=>`<div class="alert-mini"><i class="ti ti-alert-circle"></i><span><b>${a.nombre}</b> — ${a.msg}</span></div>`).join('')
+            : '<div class="success-mini"><i class="ti ti-check"></i> ¡Excelente! Todos tus estudiantes van bien</div>'}
+        </div>
+      </div>
+
+      <!-- ACCESOS RÁPIDOS DOCENTE -->
+      <div class="wcard">
+        <div class="wcard-title"><i class="ti ti-bolt"></i> Accesos rápidos</div>
+        <div class="quick-actions">
+          <button class="qa-btn" onclick="dN('migrupo')">
+            <div class="qa-icon" style="background:#EEF2FF"><i class="ti ti-users" style="color:#1565C0"></i></div>
+            <div><div class="qa-text">Mi grupo</div><div class="qa-sub">Ver equipos</div></div>
+          </button>
+          <button class="qa-btn" onclick="dN('actividades')">
+            <div class="qa-icon" style="background:#FFF7ED"><i class="ti ti-flag" style="color:#E65100"></i></div>
+            <div><div class="qa-text">Actividades</div><div class="qa-sub">Configurar</div></div>
+          </button>
+          <button class="qa-btn" onclick="dN('reporte')">
+            <div class="qa-icon" style="background:#F0FDF9"><i class="ti ti-chart-bar" style="color:#00695C"></i></div>
+            <div><div class="qa-text">Reporte</div><div class="qa-sub">Resultados</div></div>
+          </button>
+          <button class="qa-btn" onclick="dN('equipos')">
+            <div class="qa-icon" style="background:#F3E8FF"><i class="ti ti-arrows-shuffle" style="color:#7C3AED"></i></div>
+            <div><div class="qa-text">Equipos</div><div class="qa-sub">Reorganizar</div></div>
+          </button>
+          <button class="qa-btn" onclick="dN('observacion')">
+            <div class="qa-icon" style="background:#FFF8E7"><i class="ti ti-message-circle" style="color:#F5A623"></i></div>
+            <div><div class="qa-text">Mi observación</div><div class="qa-sub">Cierre proceso</div></div>
+          </button>
+          <button class="qa-btn" onclick="dN('carga')">
+            <div class="qa-icon" style="background:var(--g100)"><i class="ti ti-file-upload" style="color:var(--g500)"></i></div>
+            <div><div class="qa-text">Cargar Excel</div><div class="qa-sub">Actualizar grupo</div></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── ESTUDIANTE ───────────────────────────────────────────
+function rEstudianteBienvenida(){
+  const g=DB.grupos.find(x=>x.id===APP.session.grupoId);
+  const est=g?.estudiantes?.find(e=>e.correo===APP.session.email);
+  const nombre=APP.session.nombre.split(' ')[0];
+  const ev=calcEvalsEst(APP.session.email);
+  const meta=DB.config?.metaCert||40;
+  const pct=Math.min(100,Math.round(ev/meta*100));
+  const act=DB.actividades.filter(a=>a.grupoId===APP.session.grupoId);
+
+  // Detectar paso actual del estudiante
+  const tieneEntrada=DB.instrEntrada.find(i=>i.email===APP.session.email&&i.grupoId===APP.session.grupoId);
+  const tieneEval=DB.evaluaciones.some(e=>e.evaluadorEmail===APP.session.email&&e.grupoId===APP.session.grupoId);
+  const tieneSalida=DB.instrSalida.find(i=>i.email===APP.session.email&&i.grupoId===APP.session.grupoId);
+  const tieneObs=DB.observaciones.find(o=>o.email===APP.session.email&&o.grupoId===APP.session.grupoId);
+
+  let pasoActual=0;
+  if(tieneEntrada&&!tieneEval) pasoActual=1;
+  else if(tieneEval&&!tieneSalida) pasoActual=2;
+  else if(tieneSalida&&!tieneObs) pasoActual=3;
+  else if(tieneObs) pasoActual=4;
+
+  const pasos=[
+    {label:'Instrumento de entrada',sub:'Diagnóstico inicial',done:!!tieneEntrada,step:0},
+    {label:'Evaluación entre pares',sub:'Evaluar a mi equipo',done:tieneEval,step:1},
+    {label:'Instrumento de salida',sub:'Reflexión final',done:!!tieneSalida,step:2},
+    {label:'Observación final',sub:'Tu voz importa',done:!!tieneObs,step:3},
+  ];
+
+  const completado=pasoActual>=4;
+
+  return `<div class="welcome-wrap">
+    <div class="welcome-hero">
+      <div class="welcome-hero-text">
+        <h1>¡Hola, ${nombre}! 👋</h1>
+        <p>${g?.asignatura?.nombre||'—'} · Equipo ${est?.equipo||'—'}</p>
+        <div class="welcome-hero-meta">
+          <span><i class="ti ti-school"></i> ${g?.programa||'—'}</span>
+          <span><i class="ti ti-circle-dot"></i> Período ${g?.periodo||'—'}</span>
+        </div>
+      </div>
+      <div class="welcome-avatar">${ini(APP.session.nombre)}</div>
+    </div>
+
+    <div class="welcome-grid">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- PROGRESO CERTIFICADO -->
+        <div class="wcard">
+          <div class="wcard-title"><i class="ti ti-certificate" style="color:var(--go)"></i> Mi progreso al certificado</div>
+          <div class="cert-prog-wrap">
+            <div class="cert-prog-header">
+              <span>${ev} <span class="cert-prog-sub">de ${meta} evaluaciones</span></span>
+              <span style="color:${pct>=100?'var(--su)':pct>=50?'var(--go)':'var(--ac)'}">${pct}%</span>
+            </div>
+            <div class="cert-big-bar"><div class="cert-big-fill" style="width:${pct}%"></div></div>
+            <div class="cert-prog-labels">
+              <span>Inicio</span>
+              <span>${pct>=100?'🏆 ¡Certificado listo!':'Faltan '+Math.max(0,meta-ev)+' evaluaciones'}</span>
+              <span>Meta: ${meta}</span>
+            </div>
+          </div>
+          ${pct>=100?`<div class="success-mini" style="margin-top:8px"><i class="ti ti-certificate"></i> ¡Felicitaciones! Ya puedes solicitar tu certificado</div>`:''}
+        </div>
+
+        <!-- ACTIVIDAD ACTIVA -->
+        ${act.length>0?`<div class="wcard">
+          <div class="wcard-title"><i class="ti ti-flag"></i> Actividad activa</div>
+          ${act.map(a=>`<div class="act-welcome">
+            <h4>${a.nombre}</h4>
+            <p>${a.descripcion||''}</p>
+            ${a.enlace?`<a href="${a.enlace}" target="_blank" style="color:rgba(255,255,255,.8);font-size:11px;display:flex;align-items:center;gap:4px;margin-top:6px"><i class="ti ti-external-link"></i> ${a.enlaceTexto||'Ver material'}</a>`:''}
+          </div>`).join('')}
+        </div>`:''}
+      </div>
+
+      <!-- PASOS DEL PROCESO -->
+      <div class="wcard">
+        <div class="wcard-title"><i class="ti ti-list-check"></i> Mi proceso de evaluación</div>
+        <div class="progress-steps">
+          ${pasos.map((p,i)=>{
+            const isDone=p.done;
+            const isActive=!completado&&pasoActual===i;
+            const isLocked=!isDone&&!isActive;
+            return `<div class="ps-item ${isDone?'done':isActive?'active':'locked'}" 
+              style="${isActive?'cursor:pointer':''}" 
+              onclick="${isActive?`continuar()`:''}">
+              <div class="ps-icon">${isDone?'✓':isActive?`${i+1}`:`${i+1}`}</div>
+              <div style="flex:1">
+                <div class="ps-label">${p.label}</div>
+                <div class="ps-sub">${isDone?'Completado ✓':isActive?'En progreso — clic para continuar':p.sub}</div>
+              </div>
+              ${isActive?'<i class="ti ti-arrow-right ps-arrow"></i>':''}
+            </div>`;
+          }).join('')}
+        </div>
+        ${!completado?`<button class="btn-continuar" onclick="continuar()" style="margin-top:16px">
+          <i class="ti ti-player-play"></i> ${pasoActual===0?'Comenzar proceso':'Continuar donde quedé'}
+        </button>`:`<div class="success-mini" style="margin-top:16px;justify-content:center">
+          <i class="ti ti-circle-check"></i> ¡Proceso completado! Gracias por participar
+        </div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── CONTINUAR PROCESO ESTUDIANTE ────────────────────────
+function continuar(){
+  const tieneEntrada=DB.instrEntrada.find(i=>i.email===APP.session.email&&i.grupoId===APP.session.grupoId);
+  const tieneEval=DB.evaluaciones.some(e=>e.evaluadorEmail===APP.session.email&&e.grupoId===APP.session.grupoId);
+  const tieneSalida=DB.instrSalida.find(i=>i.email===APP.session.email&&i.grupoId===APP.session.grupoId);
+  const tieneObs=DB.observaciones.find(o=>o.email===APP.session.email&&o.grupoId===APP.session.grupoId);
+
+  if(!tieneEntrada) goStep(0);
+  else if(!tieneEval) goStep(1);
+  else if(!tieneSalida) goStep(2);
+  else if(!tieneObs) goStep(3);
+  else goStep(0);
 }
 
 </script>
