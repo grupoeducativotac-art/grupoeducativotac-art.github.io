@@ -466,6 +466,45 @@ table tbody tr:hover td{background:var(--g50)}
 .kanban-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
 .kanban-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g500);padding:6px 12px;background:var(--g100);border-radius:20px}
 
+
+/* ACCIONES TABLA */
+.action-btn{width:30px;height:30px;border-radius:6px;border:1.5px solid var(--g200);background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;transition:all .2s;font-family:var(--f)}
+.action-btn:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.action-btn.cal{color:#7C3AED;border-color:#DDD6FE} .action-btn.cal:hover{background:#F3E8FF;border-color:#7C3AED}
+.action-btn.ver{color:var(--p);border-color:#BFDBFE} .action-btn.ver:hover{background:var(--px);border-color:var(--p)}
+.action-btn.edi{color:var(--go);border-color:#FDE68A} .action-btn.edi:hover{background:#FFFBEB;border-color:var(--go)}
+.action-btn.del{color:var(--ac);border-color:#FECACA} .action-btn.del:hover{background:#FEF2F2;border-color:var(--ac)}
+.action-btn.eva{color:var(--su);border-color:#BBF7D0} .action-btn.eva:hover{background:var(--sl);border-color:var(--su)}
+
+/* MODAL PROGRESO ESTUDIANTE */
+.prog-hero{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--rl);padding:20px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:16px}
+.prog-avatar{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;flex-shrink:0}
+.comp-progress-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:.5px solid var(--g100)}
+.comp-progress-row:last-child{border-bottom:none}
+.comp-progress-label{width:160px;font-size:12px;font-weight:600;color:var(--g700);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.comp-progress-bar-wrap{flex:1;height:8px;background:var(--g100);border-radius:4px;overflow:hidden}
+.comp-progress-bar-fill{height:8px;border-radius:4px;transition:width .5s}
+.comp-progress-val{width:40px;text-align:right;font-size:12px;font-weight:700;color:var(--g700);flex-shrink:0}
+
+/* ENTRAR COMO ROL */
+.rol-card{border:2px solid var(--g200);border-radius:var(--rl);padding:18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.rol-card:hover{border-color:var(--ac);background:rgba(233,69,96,.03);transform:translateY(-1px)}
+.rol-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.rol-card-title{font-size:13px;font-weight:700;color:var(--g800)}
+.rol-card-sub{font-size:11px;color:var(--g500);margin-top:2px}
+
+/* EVALUACIÓN ADMIN/DOCENTE */
+.eval-wrap{padding:20px}
+.eval-comp-header{background:linear-gradient(135deg,var(--p),var(--pl));border-radius:var(--rl);padding:16px 20px;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.eval-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.eval-est-card{background:#fff;border:1.5px solid var(--g200);border-radius:var(--rl);padding:14px;transition:all .2s}
+.eval-est-card:hover{border-color:var(--ac);box-shadow:0 2px 8px rgba(233,69,96,.1)}
+.eval-est-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--g100)}
+.eval-stars{display:flex;gap:4px;flex-wrap:wrap}
+.eval-star{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--g200);background:var(--g50);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--g400);transition:all .15s}
+.eval-star:hover{border-color:var(--g300);background:var(--g100)}
+.eval-star.sel{background:#7C3AED;border-color:#7C3AED;color:#fff}
+
 </style>
 </head>
 <body>
@@ -528,6 +567,7 @@ table tbody tr:hover td{background:var(--g50)}
       <div class="sb-item" onclick="aN('certificados')" id="sa-certificados"><i class="ti ti-certificate"></i> Certificados</div>
       <div class="sb-item" onclick="aN('instrumentos')" id="sa-instrumentos"><i class="ti ti-clipboard-list"></i> Instrumentos</div>
       <div class="sb-section">Sistema</div>
+      <div class="sb-item" onclick="abrirModalRol()" id="sa-entrar-rol"><i class="ti ti-user-switch"></i> Entrar como rol...</div>
       <div class="sb-item" onclick="aN('periodos')" id="sa-periodos"><i class="ti ti-calendar"></i> Períodos</div>
       <div class="sb-item" onclick="aN('config')" id="sa-config"><i class="ti ti-settings"></i> Configuración</div>
     </div>
@@ -559,6 +599,8 @@ table tbody tr:hover td{background:var(--g50)}
       <div class="sb-section">Reportes</div>
       <div class="sb-item" onclick="dN('reporte')" id="sd-reporte"><i class="ti ti-chart-bar"></i> Reporte grupo</div>
       <div class="sb-item" onclick="dN('alertas')" id="sd-alertas"><i class="ti ti-alert-triangle"></i> Alertas <span class="sb-badge" id="d-alert-badge">0</span></div>
+      <div class="sb-section">Evaluación</div>
+      <div class="sb-item" onclick="dN('evaluar')" id="sd-evaluar"><i class="ti ti-star"></i> Evaluar estudiantes</div>
       <div class="sb-section">Cierre</div>
       <div class="sb-item" onclick="dN('observacion')" id="sd-observacion"><i class="ti ti-message-circle"></i> Mi observación</div>
     </div>
@@ -994,9 +1036,11 @@ function rAdminGrupos(){
       <button class="btn btn-s btn-sm" style="margin-left:4px" onclick="abrirFechasGrupo('${g.id}')" title="Editar fechas"><i class="ti ti-calendar"></i></button>
     </td>
     <td>
-      <button class="btn btn-s btn-sm" title="Ver como docente" onclick="entrarComoUsuario('${g.docente?.correo}','${g.docente?.nombresApellidos}','docente')"><i class="ti ti-user-check"></i></button>
-      <button class="btn btn-s btn-sm" onclick="verGrupoDetalle('${g.id}')"><i class="ti ti-eye"></i></button>
-      <button class="btn btn-da btn-sm" onclick="eliminarGrupo('${g.id}')"><i class="ti ti-trash"></i></button>
+      <div style="display:flex;gap:4px">
+        <button class="action-btn eva" title="Evaluar como docente" onclick="evaluarComoDocente('${g.id}')"><i class="ti ti-star"></i></button>
+        <button class="action-btn ver" title="Ver detalle" onclick="verGrupoDetalle('${g.id}')"><i class="ti ti-eye"></i></button>
+        <button class="action-btn del" title="Eliminar grupo" onclick="eliminarGrupo('${g.id}')"><i class="ti ti-trash"></i></button>
+      </div>
     </td>
   </tr>`).join('');
   return `
@@ -1506,7 +1550,7 @@ function dN(sec){
   const el=q('sd-'+sec);if(el){el.classList.add('act','pu');}
   destroyAll();
   const m=q('d-main');
-  const renders={bienvenida:rDocenteBienvenida,migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion};
+  const renders={bienvenida:rDocenteBienvenida,migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion,evaluar:rDocEvaluarEstudiantes};
   m.innerHTML=(renders[sec]||rDocGrupo)();
   setTimeout(()=>renderBreadcrumbDoc(sec),100);
   if(sec==='reporte')setTimeout(()=>renderDocCharts(),100);
@@ -3133,9 +3177,11 @@ function rAdminEstudiantes(){
         </td>
         <td><span class="badge ${ev>=meta?'bg-su':ev>0?'bg-wa':'bg-gy'}">${ev}/${meta}</span></td>
         <td>
-          <button class="btn btn-s btn-sm" title="Ver como estudiante" onclick="entrarComoUsuario('${e.correo}','${e.nombresApellidos}','estudiante')"><i class="ti ti-eye"></i></button>
-          <button class="btn btn-s btn-sm" onclick="abrirEditEst('${e.grupoId}','${e.correo}')"><i class="ti ti-edit"></i></button>
-          <button class="btn btn-da btn-sm" onclick="confirmarEliminarEquipo('${e.grupoId}','${e.correo}','${e.nombresApellidos}')"><i class="ti ti-user-minus"></i></button>
+          <div style="display:flex;gap:4px;align-items:center">
+            <button class="action-btn ver" title="Ver progreso" onclick="verProgresoEstudiante('${e.correo}','${e.grupoId}')"><i class="ti ti-chart-bar"></i></button>
+            <button class="action-btn edi" title="Editar datos" onclick="abrirEditEst('${e.grupoId}','${e.correo}')"><i class="ti ti-edit"></i></button>
+            <button class="action-btn del" title="Eliminar estudiante" onclick="eliminarEstudiante('${e.grupoId}','${e.correo}')"><i class="ti ti-trash"></i></button>
+          </div>
         </td>
       </tr>`;
     }).join('')}</tbody></table></div>
@@ -3639,6 +3685,397 @@ async function guardarKanban(){
   if(btn){ btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios'; btn.disabled=false; }
 }
 
+
+// ═══════════════════════════════════════════════════════
+// ENTRAR COMO ROL (Admin)
+// ═══════════════════════════════════════════════════════
+function abrirModalRol(){
+  openModal('modal-entrar-rol');
+}
+
+function abrirEntrarComoDocente(){
+  closeModal('modal-entrar-rol');
+  const list = document.getElementById('modal-sel-docente-list');
+  list.innerHTML = DB.grupos.map(g=>`
+    <div class="rol-card" onclick="entrarComoDocente('${g.id}')">
+      <div class="rol-icon" style="background:#F3E8FF">
+        <i class="ti ti-book" style="color:#7C3AED;font-size:18px"></i>
+      </div>
+      <div>
+        <div class="rol-card-title">${g.asignatura?.nombre}</div>
+        <div class="rol-card-sub">${g.docente?.nombresApellidos} · ${g.estudiantes.length} estudiantes</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--g300)"></i>
+    </div>`).join('');
+  openModal('modal-sel-docente');
+}
+
+function entrarComoDocente(gId){
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  closeModal('modal-sel-docente');
+  REAL_SESSION = {...APP.session};
+  VIEWER_MODE = true;
+  window._savingDisabled = true;
+  APP.session = {
+    email: g.docente?.correo,
+    nombre: g.docente?.nombresApellidos,
+    rol: 'docente',
+    grupoId: gId
+  };
+  const vb = document.getElementById('viewer-bar');
+  if(vb) vb.style.display='block';
+  document.getElementById('viewer-bar-text').textContent = `Viendo como docente: ${g.docente?.nombresApellidos} — ${g.asignatura?.nombre}`;
+  launchDocente();
+}
+
+function abrirEntrarComoEstudiante(){
+  closeModal('modal-entrar-rol');
+  const todos = DB.grupos.flatMap(g=>(g.estudiantes||[]).map(e=>({...e,grupoNombre:g.asignatura?.nombre,grupoId:g.id})));
+  const list = document.getElementById('modal-sel-est-list');
+  window._selEstTodos = todos;
+  renderSelEstList(todos);
+  openModal('modal-sel-estudiante');
+}
+
+function renderSelEstList(lista){
+  const list = document.getElementById('modal-sel-est-list');
+  if(!list) return;
+  list.innerHTML = lista.slice(0,30).map(e=>`
+    <div class="rol-card" style="padding:10px 14px" onclick="entrarComoEstudianteModal('${e.correo}','${e.grupoId}')">
+      <div class="rol-icon" style="background:var(--px);width:34px;height:34px;border-radius:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--p)">${ini(e.nombresApellidos)}</span>
+      </div>
+      <div>
+        <div class="rol-card-title" style="font-size:12px">${e.nombresApellidos}</div>
+        <div class="rol-card-sub">${e.grupoNombre} · Equipo ${e.equipo||'—'}</div>
+      </div>
+    </div>`).join('') + (lista.length>30?`<div style="padding:10px;text-align:center;color:var(--g400);font-size:11px">+${lista.length-30} más — use el buscador</div>`:'');
+}
+
+function filtrarSelEst(q){
+  const todos = window._selEstTodos || [];
+  if(!q) return renderSelEstList(todos);
+  const filt = todos.filter(e=>e.nombresApellidos.toLowerCase().includes(q.toLowerCase())||e.documento?.includes(q)||e.correo?.toLowerCase().includes(q.toLowerCase()));
+  renderSelEstList(filt);
+}
+
+function entrarComoEstudianteModal(correo, gId){
+  const g = DB.grupos.find(x=>x.id===gId);
+  const est = g?.estudiantes?.find(e=>e.correo===correo);
+  if(!est) return;
+  closeModal('modal-sel-estudiante');
+  REAL_SESSION = {...APP.session};
+  VIEWER_MODE = true;
+  window._savingDisabled = true;
+  APP.session = {email:correo, nombre:est.nombresApellidos, rol:'estudiante', grupoId:gId};
+  const vb = document.getElementById('viewer-bar');
+  if(vb) vb.style.display='block';
+  document.getElementById('viewer-bar-text').textContent = `Viendo como estudiante: ${est.nombresApellidos}`;
+  launchEstudiante();
+}
+
+// ═══════════════════════════════════════════════════════
+// VER PROGRESO ESTUDIANTE
+// ═══════════════════════════════════════════════════════
+function verProgresoEstudiante(correo, gId){
+  const g = DB.grupos.find(x=>x.id===gId);
+  const est = g?.estudiantes?.find(e=>e.correo===correo);
+  if(!est) return;
+
+  const evals = DB.evaluaciones.filter(e=>e.evaluadoEmail===correo&&e.grupoId===gId);
+  const meta = DB.config.metaCert||40;
+  const totalEvals = calcEvalsEst(correo);
+  const pct = Math.min(100,Math.round(totalEvals/meta*100));
+
+  // Promedio por competencia
+  const compScores = COMPETENCIAS.map((_,ci)=>{
+    const vals = evals.filter(e=>e.ci===ci).map(e=>e.val);
+    return vals.length>0?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):null;
+  });
+
+  // Instrumento entrada/salida
+  const entrada = DB.instrEntrada.find(i=>i.email===correo&&i.grupoId===gId);
+  const salida = DB.instrSalida.find(i=>i.email===correo&&i.grupoId===gId);
+
+  const content = document.getElementById('modal-progreso-content');
+  if(!content) return;
+
+  content.innerHTML = `
+    <!-- HERO -->
+    <div class="prog-hero">
+      <div class="prog-avatar">${ini(est.nombresApellidos)}</div>
+      <div style="flex:1">
+        <div style="font-size:16px;font-weight:700">${est.nombresApellidos}</div>
+        <div style="font-size:12px;opacity:.8;margin-top:2px">${g.asignatura?.nombre} · Equipo ${est.equipo||'—'}</div>
+        <div style="font-size:11px;opacity:.6;margin-top:2px">${est.correo}</div>
+      </div>
+      <div style="text-align:center;background:rgba(255,255,255,.15);border-radius:var(--r);padding:12px 18px">
+        <div style="font-size:24px;font-weight:800">${totalEvals}</div>
+        <div style="font-size:10px;opacity:.75">de ${meta} evals</div>
+        <div style="font-size:11px;font-weight:600;margin-top:4px">${pct}%</div>
+      </div>
+    </div>
+
+    <!-- BARRA CERTIFICADO -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:12px;font-weight:600;color:var(--g700);margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>Progreso al certificado</span>
+        <span>${pct>=100?'🏆 ¡Listo!':'Faltan '+(meta-totalEvals)+' evaluaciones'}</span>
+      </div>
+      <div style="height:10px;background:var(--g100);border-radius:20px;overflow:hidden">
+        <div style="height:10px;background:${pct>=100?'var(--su)':pct>=50?'var(--go)':'var(--ac)'};border-radius:20px;width:${pct}%;transition:width .5s"></div>
+      </div>
+    </div>
+
+    <!-- COMPETENCIAS -->
+    <div style="font-size:12px;font-weight:700;color:var(--g700);margin-bottom:10px;display:flex;align-items:center;gap:6px">
+      <i class="ti ti-chart-radar" style="color:var(--ac)"></i> Evaluación por competencia
+      <span style="font-size:10px;font-weight:400;color:var(--g400);margin-left:4px">— Anónima: no se muestra quién calificó</span>
+    </div>
+    <div style="margin-bottom:18px">
+      ${compScores.map((score,ci)=>{
+        const comp = COMPETENCIAS[ci];
+        const pctComp = score ? Math.round(score/5*100) : 0;
+        return `<div class="comp-progress-row">
+          <div class="comp-progress-label">
+            <span style="font-size:16px">${comp.e}</span> ${comp.n}
+          </div>
+          <div class="comp-progress-bar-wrap">
+            <div class="comp-progress-bar-fill" style="width:${pctComp}%;background:${comp.c}"></div>
+          </div>
+          <div class="comp-progress-val" style="color:${comp.c}">${score||'—'}</div>
+          <div style="width:30px;text-align:right;font-size:10px;color:var(--g400)">/5</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- INSTRUMENTOS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="padding:12px;border-radius:var(--r);border:1px solid ${entrada?'var(--su)':'var(--g200)'};background:${entrada?'var(--sl)':'var(--g50)'}">
+        <div style="font-size:11px;font-weight:700;color:${entrada?'#166534':'var(--g400)'}">
+          ${entrada?'✅':'⏳'} Instrumento entrada
+        </div>
+        <div style="font-size:10px;color:var(--g400);margin-top:3px">${entrada?'Completado el '+fmt(entrada.fecha):'Pendiente'}</div>
+      </div>
+      <div style="padding:12px;border-radius:var(--r);border:1px solid ${salida?'var(--su)':'var(--g200)'};background:${salida?'var(--sl)':'var(--g50)'}">
+        <div style="font-size:11px;font-weight:700;color:${salida?'#166534':'var(--g400)'}">
+          ${salida?'✅':'⏳'} Instrumento salida
+        </div>
+        <div style="font-size:10px;color:var(--g400);margin-top:3px">${salida?'Completado el '+fmt(salida.fecha):'Pendiente'}</div>
+      </div>
+    </div>
+
+    <!-- DETALLE POR CRITERIO (anónimo) -->
+    <details style="margin-top:4px">
+      <summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--g700);padding:8px 0;user-select:none">
+        <i class="ti ti-list-details"></i> Ver detalle por criterio (evaluaciones anónimas)
+      </summary>
+      <div style="margin-top:12px">
+        ${COMPETENCIAS.map((comp,ci)=>{
+          const crEvals = comp.cr.map((_,ki)=>{
+            const vals = evals.filter(e=>e.ci===ci&&e.ki===ki).map(e=>e.val);
+            const avg = vals.length>0?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):null;
+            return {avg, count:vals.length};
+          });
+          return `<div style="margin-bottom:12px">
+            <div style="font-size:11px;font-weight:700;color:${comp.c};margin-bottom:6px;display:flex;align-items:center;gap:5px">
+              ${comp.e} ${comp.n}
+            </div>
+            ${comp.cr.map((crit,ki)=>`
+              <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:.5px solid var(--g100);font-size:11px">
+                <div style="flex:1;color:var(--g600)">${crit}</div>
+                <div style="font-weight:700;color:${comp.c};width:30px;text-align:right">${crEvals[ki].avg||'—'}</div>
+                <div style="color:var(--g400);width:50px">${crEvals[ki].count} voto(s)</div>
+              </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+    </details>
+  `;
+  openModal('modal-progreso-est');
+}
+
+// ═══════════════════════════════════════════════════════
+// EVALUACIÓN DOCENTE/ADMIN A ESTUDIANTES
+// ═══════════════════════════════════════════════════════
+let evalDocRatings = {};
+let evalDocGrupoId = null;
+
+function rDocEvaluarEstudiantes(){
+  const g = getDocGrupo();
+  if(!g) return '<div class="panel"><p>Sin grupo asignado.</p></div>';
+  const equipos = [...new Set(g.estudiantes.map(e=>e.equipo).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+
+  return `
+  <div style="padding:0">
+    <div class="eval-comp-header">
+      <i class="ti ti-star" style="font-size:24px"></i>
+      <div>
+        <div style="font-size:15px;font-weight:700">Evaluar estudiantes — ${g.asignatura?.nombre}</div>
+        <div style="font-size:12px;opacity:.75">Como docente, califique las competencias de sus estudiantes</div>
+      </div>
+    </div>
+
+    <!-- SELECTOR COMPETENCIA -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      ${COMPETENCIAS.map((c,i)=>`
+        <button onclick="selCompEvalDoc(${i})" id="btn-comp-doc-${i}"
+          style="padding:7px 14px;border-radius:20px;border:1.5px solid ${i===0?c.c:'var(--g200)'};
+          background:${i===0?c.c+'15':'#fff'};color:${i===0?c.c:'var(--g500)'};
+          font-size:11px;font-weight:600;cursor:pointer;font-family:var(--f);transition:all .2s">
+          ${c.e} ${c.n}
+        </button>`).join('')}
+    </div>
+
+    <div id="eval-doc-body"></div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--g200);display:flex;gap:10px">
+      <button class="btn btn-p" onclick="guardarEvalDocente()">
+        <i class="ti ti-device-floppy"></i> Guardar evaluación
+      </button>
+      <button class="btn btn-s" onclick="dN('bienvenida')">Cancelar</button>
+    </div>
+  </div>`;
+}
+
+let evalDocCompActual = 0;
+
+function selCompEvalDoc(ci){
+  evalDocCompActual = ci;
+  COMPETENCIAS.forEach((_,i)=>{
+    const btn = document.getElementById(`btn-comp-doc-${i}`);
+    if(btn){
+      const c = COMPETENCIAS[i];
+      btn.style.borderColor = i===ci?c.c:'var(--g200)';
+      btn.style.background = i===ci?c.c+'15':'#fff';
+      btn.style.color = i===ci?c.c:'var(--g500)';
+    }
+  });
+  renderEvalDocBody(ci);
+}
+
+function renderEvalDocBody(ci){
+  const g = getDocGrupo();
+  if(!g) return;
+  const comp = COMPETENCIAS[ci];
+  const body = document.getElementById('eval-doc-body');
+  if(!body) return;
+
+  if(!evalDocRatings[ci]) evalDocRatings[ci]={};
+
+  let html = `<div style="background:${comp.bg};border:1px solid ${comp.c}22;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
+    <div style="font-size:14px;font-weight:700;color:${comp.c}">${comp.e} ${comp.n}</div>
+    <div style="font-size:11px;color:var(--g500);margin-top:2px">Escala: 1=Nunca · 2=Pocas veces · 3=A veces · 4=Casi siempre · 5=Siempre</div>
+  </div>`;
+
+  html += '<div class="eval-grid">';
+  g.estudiantes.forEach((est,idx)=>{
+    const av = AVC[idx%AVC.length];
+    html += `<div class="eval-est-card">
+      <div class="eval-est-header">
+        <div style="width:32px;height:32px;border-radius:50%;background:${av};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0">${ini(est.nombresApellidos)}</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--g800)">${est.nombresApellidos.split(' ').slice(0,3).join(' ')}</div>
+          <div style="font-size:10px;color:var(--g400)">Eq. ${est.equipo||'—'}</div>
+        </div>
+      </div>
+      ${comp.cr.map((crit,ki)=>{
+        const cur = evalDocRatings[ci]?.[est.correo]?.[ki]||0;
+        return `<div style="margin-bottom:8px">
+          <div style="font-size:10px;color:var(--g500);margin-bottom:4px;line-height:1.3">${crit}</div>
+          <div class="eval-stars">
+            ${[1,2,3,4,5].map(v=>`
+              <div class="eval-star ${cur===v?'sel':''}"
+                onclick="setEvalDoc('${est.correo}',${ci},${ki},${v})">
+                ${v}
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+function setEvalDoc(correo, ci, ki, val){
+  if(!evalDocRatings[ci]) evalDocRatings[ci]={};
+  if(!evalDocRatings[ci][correo]) evalDocRatings[ci][correo]={};
+  evalDocRatings[ci][correo][ki] = val;
+  // Update star UI
+  const stars = document.querySelectorAll(`[onclick*="setEvalDoc('${correo}',${ci},${ki}"]`);
+  // Re-render just the stars
+  renderEvalDocBody(ci);
+}
+
+async function guardarEvalDocente(){
+  const g = getDocGrupo();
+  if(!g){ showToast('Sin grupo', 'er'); return; }
+  const docEmail = APP.session.email;
+  let count = 0;
+
+  // Verificar que tenga al menos una competencia completa
+  const tieneAlgo = Object.keys(evalDocRatings).length > 0;
+  if(!tieneAlgo){ showToast('Califique al menos una competencia', 'wa'); return; }
+
+  // Guardar en DB
+  for(const [ciStr, estMap] of Object.entries(evalDocRatings)){
+    const ci = parseInt(ciStr);
+    for(const [correo, criterios] of Object.entries(estMap)){
+      for(const [kiStr, val] of Object.entries(criterios)){
+        const ki = parseInt(kiStr);
+        if(!val) continue;
+        // Remover evaluación previa del docente para este estudiante/competencia/criterio
+        DB.evaluaciones = DB.evaluaciones.filter(e=>
+          !(e.evaluadorEmail===docEmail&&e.evaluadoEmail===correo&&e.grupoId===g.id&&e.ci===ci&&e.ki===ki)
+        );
+        DB.evaluaciones.push({
+          evaluadorEmail:docEmail, evaluadoEmail:correo, grupoId:g.id,
+          equipoNum:'docente', ci, ki, val, fecha:new Date().toISOString()
+        });
+        count++;
+      }
+    }
+  }
+
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+  try {
+    await saveToSupabase();
+    showToast(`✅ ${count} calificaciones guardadas en la base de datos`);
+  } catch(e){
+    showToast(`✅ ${count} calificaciones guardadas localmente`);
+  }
+  logActivity(`Docente evaluó ${Object.keys(evalDocRatings).length} competencias en ${g.asignatura?.nombre}`);
+  evalDocRatings = {};
+}
+
+
+// Evaluar desde tabla de grupos (admin actúa como docente)
+function evaluarComoDocente(gId){
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  // Entrar temporalmente como docente de ese grupo
+  REAL_SESSION = {...APP.session};
+  VIEWER_MODE = false; // No es solo lectura - puede evaluar
+  window._savingDisabled = false;
+  APP.session = {
+    email: g.docente?.correo||'superadmin@h21.edu.co',
+    nombre: g.docente?.nombresApellidos||APP.session.nombre,
+    rol: 'docente',
+    grupoId: gId,
+    esAdmin: true // Flag para recordar que es admin evaluando
+  };
+  // Mostrar barra de contexto
+  const vb = document.getElementById('viewer-bar');
+  if(vb) vb.style.display='block';
+  document.getElementById('viewer-bar-text').textContent = 
+    `Evaluando como docente: ${g.asignatura?.nombre} — Clic en "Salir" para volver al admin`;
+  showScreen('s-doc');
+  NAV_HISTORY.doc = [];
+  dN('evaluar');
+}
+
 </script>
 
 <!-- TOAST NOTIFICACIÓN -->
@@ -3713,6 +4150,62 @@ async function guardarKanban(){
       </button>
       <button class="btn btn-s" onclick="closeModal('modal-config-equipos')">Cancelar</button>
     </div>
+  </div>
+</div>
+
+
+<!-- MODAL PROGRESO ESTUDIANTE -->
+<div class="modal-bg" id="modal-progreso-est">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title">Progreso del estudiante <span class="modal-close" onclick="closeModal('modal-progreso-est')"><i class="ti ti-x"></i></span></div>
+    <div id="modal-progreso-content"></div>
+  </div>
+</div>
+
+<!-- MODAL ENTRAR COMO ROL -->
+<div class="modal-bg" id="modal-entrar-rol">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title"><i class="ti ti-user-switch" style="color:var(--ac)"></i> Entrar con rol de... <span class="modal-close" onclick="closeModal('modal-entrar-rol')"><i class="ti ti-x"></i></span></div>
+    <p style="font-size:12px;color:var(--g500);margin-bottom:16px">Seleccione el rol con el que desea navegar. Entrará en <b>modo solo lectura</b> — ningún cambio se guardará.</p>
+    
+    <div class="rol-card" onclick="abrirEntrarComoDocente()">
+      <div class="rol-icon" style="background:#F3E8FF"><i class="ti ti-user-check" style="color:#7C3AED;font-size:22px"></i></div>
+      <div>
+        <div class="rol-card-title">Entrar como Docente</div>
+        <div class="rol-card-sub">Ver la plataforma desde la perspectiva del docente de un grupo</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--g300)"></i>
+    </div>
+
+    <div class="rol-card" onclick="abrirEntrarComoEstudiante()">
+      <div class="rol-icon" style="background:#EEF2FF"><i class="ti ti-user" style="color:var(--p);font-size:22px"></i></div>
+      <div>
+        <div class="rol-card-title">Entrar como Estudiante</div>
+        <div class="rol-card-sub">Ver el flujo de evaluación desde la perspectiva de un estudiante</div>
+      </div>
+      <i class="ti ti-chevron-right" style="margin-left:auto;color:var(--g300)"></i>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SELECCIONAR DOCENTE PARA ENTRAR -->
+<div class="modal-bg" id="modal-sel-docente">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-title"><i class="ti ti-user-check" style="color:#7C3AED"></i> Seleccionar docente <span class="modal-close" onclick="closeModal('modal-sel-docente')"><i class="ti ti-x"></i></span></div>
+    <p style="font-size:12px;color:var(--g500);margin-bottom:14px">Seleccione el grupo del que desea ver la perspectiva del docente:</p>
+    <div id="modal-sel-docente-list"></div>
+  </div>
+</div>
+
+<!-- MODAL SELECCIONAR ESTUDIANTE PARA ENTRAR -->
+<div class="modal-bg" id="modal-sel-estudiante">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title"><i class="ti ti-user" style="color:var(--p)"></i> Seleccionar estudiante <span class="modal-close" onclick="closeModal('modal-sel-estudiante')"><i class="ti ti-x"></i></span></div>
+    <div class="fgg" style="margin-bottom:12px">
+      <input id="sel-est-search" placeholder="Buscar estudiante..." oninput="filtrarSelEst(this.value)"
+        style="width:100%;border:1.5px solid var(--g200);border-radius:6px;padding:9px 11px;font-size:12px;outline:none;font-family:var(--f)">
+    </div>
+    <div id="modal-sel-est-list" style="max-height:360px;overflow-y:auto"></div>
   </div>
 </div>
 
