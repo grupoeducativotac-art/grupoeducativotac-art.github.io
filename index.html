@@ -390,6 +390,30 @@ table tbody tr:hover td{background:var(--g50)}
 .btn-continuar{width:100%;background:var(--ac);color:#fff;border:none;border-radius:var(--r);padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--f);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:4px}
 .btn-continuar:hover{background:var(--acd);transform:translateY(-1px)}
 
+
+/* BREADCRUMB / RUTA DE NAVEGACIÓN */
+.breadcrumb-bar{background:#fff;border-bottom:1px solid var(--g200);padding:8px 22px;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g400);flex-shrink:0;min-height:36px}
+.breadcrumb-bar.dark{background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06)}
+.bc-item{display:flex;align-items:center;gap:6px;color:var(--g400);cursor:pointer;transition:color .15s;white-space:nowrap}
+.bc-item:hover{color:var(--ac)}
+.bc-item.active{color:var(--g700);font-weight:600;cursor:default}
+.bc-item.active:hover{color:var(--g700)}
+.bc-sep{color:var(--g300);font-size:10px}
+.bc-back{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;border:1px solid var(--g200);background:#fff;color:var(--g600);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--f);margin-right:8px}
+.bc-back:hover{background:var(--g50);border-color:var(--g300);color:var(--g800)}
+.bc-back i{font-size:13px}
+
+/* EQUIPOS VISUALIZACIÓN */
+.equipos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px}
+.equipo-card{background:#fff;border:1px solid var(--g200);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.equipo-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.equipo-num{background:var(--p);color:#fff;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700}
+.equipo-member{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:.5px solid var(--g100)}
+.equipo-member:last-child{border-bottom:none}
+.equipo-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.equipo-member-name{font-size:12px;color:var(--g700);font-weight:500}
+.equipo-member-doc{font-size:10px;color:var(--g400)}
+
 </style>
 </head>
 <body>
@@ -436,6 +460,7 @@ table tbody tr:hover td{background:var(--g50)}
     </div>
   </div>
   <div class="notif-panel" id="notif-a"></div>
+  <div id="a-breadcrumb" class="breadcrumb-bar" style="display:none"></div>
   <div class="app-layout">
     <div class="sidebar" id="a-side">
       <div class="sb-section">Principal</div>
@@ -470,6 +495,7 @@ table tbody tr:hover td{background:var(--g50)}
     </div>
   </div>
   <div class="notif-panel" id="notif-d"></div>
+  <div id="d-breadcrumb" class="breadcrumb-bar" style="display:none"></div>
   <div class="app-layout">
     <div class="sidebar">
       <div class="sb-section">Mi espacio</div>
@@ -796,7 +822,9 @@ function seleccionarMateria(gId){
 
 function doLogout(){
   APP.session=null;APP.ratings={};APP.instrE={};APP.instrS={};APP.evalStep=0;APP.curComp=0;
+  NAV_HISTORY={admin:[],doc:[]};
   destroyAll();showScreen('s-login');
+  history.replaceState(null, '', window.location.pathname);
   q('l-email').value='';q('l-pass').value='';
 }
 q('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
@@ -808,7 +836,10 @@ q('l-email').addEventListener('keydown',e=>{if(e.key==='Enter')q('l-pass').focus
 function launchAdmin(){
   q('a-sub').textContent=APP.session.nombre;
   showScreen('s-admin');
-  aN('bienvenida');
+  NAV_HISTORY.admin = [];
+  initHistoryState('admin', 'bienvenida');
+  _aN_orig('bienvenida');
+  renderBreadcrumbAdmin('bienvenida');
 }
 
 function aN(sec){
@@ -1486,7 +1517,11 @@ function launchDocente(){
   q('d-sub').textContent=g?`${g.asignatura?.nombre} · ${g.programa}`:'Mi grupo';
   const alerts=getAlertas();
   const badge=q('d-alert-badge');if(badge)badge.textContent=alerts.length;
-  showScreen('s-doc');dN('bienvenida');
+  showScreen('s-doc');
+  NAV_HISTORY.doc = [];
+  initHistoryState('doc', 'bienvenida');
+  _dN_orig('bienvenida');
+  renderBreadcrumbDoc('bienvenida');
 }
 
 function dN(sec){
@@ -1714,6 +1749,7 @@ function launchEstudiante(){
   APP.ratings={};APP.instrE={};APP.instrS={};APP.curComp=0;
   getAllPersonas().forEach(p=>{APP.ratings[p.correo]={};COMPETENCIAS.forEach((_,ci)=>{APP.ratings[p.correo][ci]={};});});
   showScreen('s-est');
+  initHistoryState('est', 'inicio');
   // Mostrar bienvenida primero
   renderBienvenidaEst();
 }
@@ -2844,6 +2880,342 @@ function continuar(){
   else if(!tieneSalida) goStep(2);
   else if(!tieneObs) goStep(3);
   else goStep(0);
+}
+
+
+// ═══════════════════════════════════════════════════════
+// SISTEMA DE NAVEGACIÓN CON HISTORIAL Y BREADCRUMB
+// ═══════════════════════════════════════════════════════
+
+// Mapa de etiquetas para el breadcrumb
+const NAV_LABELS_ADMIN = {
+  bienvenida: {label:'Inicio', icon:'ti-home'},
+  dashboard:  {label:'Dashboard', icon:'ti-layout-dashboard'},
+  grupos:     {label:'Grupos', icon:'ti-users-group'},
+  carga:      {label:'Carga masiva', icon:'ti-file-upload'},
+  estudiantes:{label:'Estudiantes', icon:'ti-user-edit'},
+  equipos:    {label:'Equipos', icon:'ti-arrows-shuffle'},
+  reportes:   {label:'Reportes', icon:'ti-chart-bar'},
+  certificados:{label:'Certificados', icon:'ti-certificate'},
+  instrumentos:{label:'Instrumentos', icon:'ti-clipboard-list'},
+  periodos:   {label:'Períodos', icon:'ti-calendar'},
+  config:     {label:'Configuración', icon:'ti-settings'}
+};
+
+const NAV_LABELS_DOC = {
+  bienvenida:  {label:'Inicio', icon:'ti-home'},
+  migrupo:     {label:'Mi grupo', icon:'ti-users'},
+  actividades: {label:'Actividades', icon:'ti-flag'},
+  equipos:     {label:'Equipos', icon:'ti-arrows-shuffle'},
+  carga:       {label:'Cargar estudiantes', icon:'ti-file-upload'},
+  reporte:     {label:'Reporte', icon:'ti-chart-bar'},
+  alertas:     {label:'Alertas', icon:'ti-alert-triangle'},
+  observacion: {label:'Mi observación', icon:'ti-message-circle'}
+};
+
+// Historial de navegación por rol
+let NAV_HISTORY = {admin:[], doc:[]};
+
+// ── ADMIN NAVEGACIÓN CON HISTORIAL ──────────────────────
+const _aN_orig = aN;
+function aN(sec){
+  // Agregar al historial si es diferente al actual
+  if(APP.aSection !== sec){
+    NAV_HISTORY.admin.push(APP.aSection);
+    if(NAV_HISTORY.admin.length > 10) NAV_HISTORY.admin.shift();
+  }
+  _aN_orig(sec);
+  renderBreadcrumbAdmin(sec);
+  // Actualizar URL hash sin recargar
+  history.pushState({role:'admin', sec}, '', '#admin/' + sec);
+}
+
+function renderBreadcrumbAdmin(sec){
+  const bar = document.getElementById('a-breadcrumb');
+  if(!bar) return;
+  const info = NAV_LABELS_ADMIN[sec] || {label: sec, icon:'ti-circle'};
+  const hasPrev = NAV_HISTORY.admin.length > 0;
+  const prevSec = NAV_HISTORY.admin[NAV_HISTORY.admin.length - 1];
+  const prevInfo = NAV_LABELS_ADMIN[prevSec] || {label: prevSec, icon:'ti-circle'};
+
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    ${hasPrev && sec !== 'bienvenida' ? `
+      <button class="bc-back" onclick="aN_back_admin()">
+        <i class="ti ti-arrow-left"></i> Volver
+      </button>` : ''}
+    <div class="bc-item" onclick="aN('bienvenida')" title="Ir al inicio">
+      <i class="ti ti-home" style="font-size:12px"></i> H21
+    </div>
+    ${sec !== 'bienvenida' ? `
+      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+      <div class="bc-item active">
+        <i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}
+      </div>` : `
+      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+      <div class="bc-item active">
+        <i class="ti ti-home" style="font-size:12px"></i> Inicio
+      </div>`}
+  `;
+}
+
+function aN_back_admin(){
+  if(NAV_HISTORY.admin.length === 0) return;
+  const prev = NAV_HISTORY.admin.pop();
+  _aN_orig(prev);
+  renderBreadcrumbAdmin(prev);
+  history.pushState({role:'admin', sec:prev}, '', '#admin/' + prev);
+}
+
+// ── DOCENTE NAVEGACIÓN CON HISTORIAL ────────────────────
+const _dN_orig = dN;
+function dN(sec){
+  if(APP.dSection !== sec){
+    NAV_HISTORY.doc.push(APP.dSection);
+    if(NAV_HISTORY.doc.length > 10) NAV_HISTORY.doc.shift();
+  }
+  _dN_orig(sec);
+  renderBreadcrumbDoc(sec);
+  history.pushState({role:'doc', sec}, '', '#doc/' + sec);
+}
+
+function renderBreadcrumbDoc(sec){
+  const bar = document.getElementById('d-breadcrumb');
+  if(!bar) return;
+  const info = NAV_LABELS_DOC[sec] || {label: sec, icon:'ti-circle'};
+  const hasPrev = NAV_HISTORY.doc.length > 0;
+
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    ${hasPrev && sec !== 'bienvenida' ? `
+      <button class="bc-back" onclick="dN_back_doc()">
+        <i class="ti ti-arrow-left"></i> Volver
+      </button>` : ''}
+    <div class="bc-item" onclick="dN('bienvenida')" title="Ir al inicio">
+      <i class="ti ti-home" style="font-size:12px"></i> H21
+    </div>
+    ${sec !== 'bienvenida' ? `
+      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+      <div class="bc-item active">
+        <i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}
+      </div>` : `
+      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+      <div class="bc-item active">
+        <i class="ti ti-home" style="font-size:12px"></i> Inicio
+      </div>`}
+  `;
+}
+
+function dN_back_doc(){
+  if(NAV_HISTORY.doc.length === 0) return;
+  const prev = NAV_HISTORY.doc.pop();
+  _dN_orig(prev);
+  renderBreadcrumbDoc(prev);
+  history.pushState({role:'doc', sec:prev}, '', '#doc/' + prev);
+}
+
+// ── INTERCEPTAR BOTÓN ATRÁS DEL NAVEGADOR ───────────────
+window.addEventListener('popstate', function(e){
+  if(!APP.session) return; // Si no hay sesión, dejar comportamiento normal
+  e.preventDefault && e.preventDefault();
+  
+  const state = e.state;
+  if(state && state.role === 'admin' && APP.session.rol === 'admin'){
+    if(NAV_HISTORY.admin.length > 0){
+      const prev = NAV_HISTORY.admin.pop();
+      _aN_orig(prev);
+      renderBreadcrumbAdmin(prev);
+    } else {
+      _aN_orig('bienvenida');
+      renderBreadcrumbAdmin('bienvenida');
+    }
+  } else if(state && state.role === 'doc' && APP.session.rol === 'docente'){
+    if(NAV_HISTORY.doc.length > 0){
+      const prev = NAV_HISTORY.doc.pop();
+      _dN_orig(prev);
+      renderBreadcrumbDoc(prev);
+    } else {
+      _dN_orig('bienvenida');
+      renderBreadcrumbDoc('bienvenida');
+    }
+  } else {
+    // Evitar salir del sistema — regresar al inicio del rol actual
+    if(APP.session?.rol === 'admin'){
+      _aN_orig('bienvenida');
+      renderBreadcrumbAdmin('bienvenida');
+      history.pushState({role:'admin', sec:'bienvenida'}, '', '#admin/bienvenida');
+    } else if(APP.session?.rol === 'docente'){
+      _dN_orig('bienvenida');
+      renderBreadcrumbDoc('bienvenida');
+      history.pushState({role:'doc', sec:'bienvenida'}, '', '#doc/bienvenida');
+    } else if(APP.session?.rol === 'estudiante'){
+      // Estudiante — volver a bienvenida
+      renderBienvenidaEst();
+      history.pushState({role:'est'}, '', '#est/inicio');
+    }
+  }
+});
+
+// Inicializar history state al entrar
+function initHistoryState(role, sec){
+  history.replaceState({role, sec}, '', '#' + role + '/' + sec);
+}
+
+// ═══════════════════════════════════════════════════════
+// MÓDULO EQUIPOS MEJORADO — Visualización persistente
+// ═══════════════════════════════════════════════════════
+function rAdminEquipos(){
+  const grupos = DB.grupos;
+  const equiposExistentes = grupos.some(g => g.estudiantes.some(e => e.equipo));
+
+  return `
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-arrows-shuffle"></i> Organización aleatoria de equipos</div>
+    <p style="color:var(--g500);font-size:13px;margin-bottom:16px">Seleccione un grupo y genere equipos automáticamente de forma aleatoria.</p>
+    <div class="fr c2">
+      <div class="fgg"><label>Grupo</label>
+        <select id="eq-grupo" onchange="mostrarEquiposActuales()">
+          <option value="">Seleccione...</option>
+          ${grupos.map(g=>`<option value="${g.id}">${g.asignatura?.nombre} (${g.estudiantes?.length} est.)</option>`).join('')}
+        </select>
+      </div>
+      <div class="fgg"><label>Integrantes por equipo</label>
+        <select id="eq-size">
+          <option value="3">3 integrantes</option>
+          <option value="4">4 integrantes</option>
+          <option value="5" selected>5 integrantes</option>
+          <option value="6">6 integrantes</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-p" onclick="generarEquiposAleatorios()"><i class="ti ti-dice"></i> Generar aleatoriamente</button>
+      <button class="btn btn-s" onclick="mostrarEquiposActuales()"><i class="ti ti-eye"></i> Ver equipos actuales</button>
+    </div>
+    <div id="eq-preview"></div>
+  </div>`;
+}
+
+function mostrarEquiposActuales(){
+  const gId = document.getElementById('eq-grupo')?.value;
+  if(!gId){ document.getElementById('eq-preview').innerHTML = ''; return; }
+  const g = DB.grupos.find(x => x.id === gId);
+  if(!g) return;
+  renderEquiposGrupo(g, 'eq-preview');
+}
+
+function renderEquiposGrupo(g, containerId){
+  const equipos = [...new Set(g.estudiantes.map(e => e.equipo).filter(Boolean))].sort((a,b) => Number(a)-Number(b));
+  const sinEquipo = g.estudiantes.filter(e => !e.equipo);
+
+  let html = '';
+  if(equipos.length === 0 && sinEquipo.length === 0){
+    html = '<div class="info-box" style="margin-top:12px"><i class="ti ti-info-circle"></i> No hay equipos generados para este grupo.</div>';
+  } else {
+    html = `<div class="info-box" style="margin-top:12px"><i class="ti ti-users-group"></i> <b>${equipos.length} equipos</b> · ${g.estudiantes.length} estudiantes · ${g.asignatura?.nombre}</div>`;
+    html += '<div class="equipos-grid">';
+    equipos.forEach((eq, idx) => {
+      const miembros = g.estudiantes.filter(e => e.equipo == eq);
+      html += `<div class="equipo-card">
+        <div class="equipo-card-header">
+          <span class="equipo-num">Equipo ${eq}</span>
+          <span class="badge bg-in">${miembros.length} integrantes</span>
+        </div>
+        ${miembros.map((e, i) => `
+          <div class="equipo-member">
+            <div class="equipo-avatar" style="background:${AVC[i%AVC.length]}">${ini(e.nombresApellidos)}</div>
+            <div>
+              <div class="equipo-member-name">${e.nombresApellidos}</div>
+              <div class="equipo-member-doc">${e.documento}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    });
+    html += '</div>';
+    if(sinEquipo.length > 0){
+      html += `<div class="warn" style="margin-top:12px"><i class="ti ti-alert-triangle"></i> ${sinEquipo.length} estudiante(s) sin equipo asignado</div>`;
+    }
+  }
+  const container = document.getElementById(containerId);
+  if(container) container.innerHTML = html;
+}
+
+function generarEquiposAleatorios(){
+  const gId = document.getElementById('eq-grupo')?.value;
+  const size = parseInt(document.getElementById('eq-size')?.value) || 5;
+  if(!gId){ alert('Seleccione un grupo.'); return; }
+  const g = DB.grupos.find(x => x.id === gId);
+  if(!g) return;
+  const mezclados = [...g.estudiantes].sort(() => Math.random() - .5);
+  let equipo = 1;
+  mezclados.forEach((est, i) => {
+    if(i > 0 && i % size === 0) equipo++;
+    est.equipo = String(equipo);
+  });
+  g.estudiantes = mezclados;
+  saveDB();
+  logActivity(`Generó equipos aleatorios para ${g.asignatura?.nombre}`);
+  renderEquiposGrupo(g, 'eq-preview');
+}
+
+// ── EQUIPOS DOCENTE MEJORADO ─────────────────────────────
+function rDocEquipos(){
+  const g = getDocGrupo();
+  if(!g) return '<div class="panel"><p>Sin grupo.</p></div>';
+  return `
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-arrows-shuffle"></i> Organizar equipos — ${g.asignatura?.nombre}</div>
+    <div class="fr c2">
+      <div class="fgg"><label>Integrantes por equipo</label>
+        <select id="deq-size">
+          <option value="3">3</option><option value="4">4</option>
+          <option value="5" selected>5</option><option value="6">6</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:8px">
+        <button class="btn btn-pu" onclick="generarEquiposDoc()"><i class="ti ti-dice"></i> Generar aleatoriamente</button>
+      </div>
+    </div>
+    <div id="deq-prev"></div>
+  </div>`;
+}
+
+function generarEquiposDoc(){
+  const g = getDocGrupo(); if(!g) return;
+  const size = parseInt(document.getElementById('deq-size')?.value) || 5;
+  const mez = [...g.estudiantes].sort(() => Math.random() - .5);
+  let eq = 1;
+  mez.forEach((e, i) => { if(i > 0 && i % size === 0) eq++; e.equipo = String(eq); });
+  g.estudiantes = mez;
+  saveDB();
+  renderEquiposGrupo(g, 'deq-prev');
+}
+
+// ── TAMBIÉN MOSTRAR EQUIPOS EN MI GRUPO (DOCENTE) ────────
+// Override para mostrar equipos como tarjetas
+function rDocGrupoEquipoCards(g){
+  const equipos = [...new Set(g.estudiantes.map(e => e.equipo).filter(Boolean))].sort((a,b) => Number(a)-Number(b));
+  if(equipos.length === 0) return '';
+  let html = '<div class="equipos-grid">';
+  equipos.forEach(eq => {
+    const miembros = g.estudiantes.filter(e => e.equipo == eq);
+    html += `<div class="equipo-card">
+      <div class="equipo-card-header">
+        <span class="equipo-num">Equipo ${eq}</span>
+        <span class="badge bg-in">${miembros.length}</span>
+      </div>
+      ${miembros.map((e, i) => `
+        <div class="equipo-member">
+          <div class="equipo-avatar" style="background:${AVC[i%AVC.length]}">${ini(e.nombresApellidos)}</div>
+          <div>
+            <div class="equipo-member-name">${e.nombresApellidos}</div>
+            <div class="equipo-member-doc">${e.correo}</div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  });
+  html += '</div>';
+  return html;
 }
 
 </script>
