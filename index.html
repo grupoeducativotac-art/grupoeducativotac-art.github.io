@@ -1074,50 +1074,9 @@ function eliminarEstudiante(gId,correo){
   saveDB();logActivity(`Eliminó estudiante ${correo}`);aN('estudiantes');
 }
 
-function rAdminEquipos(){
-  return `
-  <div class="panel">
-    <div class="panel-title"><i class="ti ti-arrows-shuffle"></i> Organización aleatoria de equipos</div>
-    <p style="color:var(--g500);font-size:13px;margin-bottom:16px">Seleccione un grupo y genere equipos automáticamente de forma aleatoria.</p>
-    <div class="fr c2">
-      <div class="fgg"><label>Grupo</label>
-        <select id="eq-grupo"><option value="">Seleccione...</option>${DB.grupos.map(g=>`<option value="${g.id}">${g.asignatura?.nombre} (${g.estudiantes?.length} est.)</option>`).join('')}</select></div>
-      <div class="fgg"><label>Integrantes por equipo</label>
-        <select id="eq-size"><option value="3">3 integrantes</option><option value="4">4 integrantes</option><option value="5" selected>5 integrantes</option><option value="6">6 integrantes</option></select></div>
-    </div>
-    <button class="btn btn-p" onclick="generarEquiposAleatorios()"><i class="ti ti-dice"></i> Generar equipos aleatorios</button>
-    <div id="eq-preview" style="margin-top:20px"></div>
-  </div>`;
-}
 
-function generarEquiposAleatorios(){
-  const gId=q('eq-grupo').value;
-  const size=parseInt(q('eq-size').value)||5;
-  if(!gId){alert('Seleccione un grupo.');return;}
-  const g=DB.grupos.find(x=>x.id===gId);
-  if(!g)return;
-  // Mezclar aleatoriamente
-  const mezclados=[...g.estudiantes].sort(()=>Math.random()-.5);
-  let equipo=1;
-  mezclados.forEach((est,i)=>{
-    if(i>0&&i%size===0)equipo++;
-    est.equipo=String(equipo);
-  });
-  g.estudiantes=mezclados;
-  saveDB();
-  const numEquipos=Math.ceil(mezclados.length/size);
-  let prev=`<div class="info-box"><i class="ti ti-check"></i> Se generaron ${numEquipos} equipos de ${size} integrantes. Vista previa:</div>`;
-  for(let eq=1;eq<=numEquipos;eq++){
-    const miembros=mezclados.filter(e=>e.equipo==eq);
-    prev+=`<div class="panel" style="margin-bottom:10px">
-      <div class="panel-title"><i class="ti ti-users"></i> Equipo ${eq} <span class="badge bg-in">${miembros.length}</span></div>
-      <div class="tw"><table><thead><tr><th>Nombre</th><th>Documento</th></tr></thead>
-      <tbody>${miembros.map(e=>`<tr><td><b>${e.nombresApellidos}</b></td><td>${e.documento}</td></tr>`).join('')}</tbody></table></div>
-    </div>`;
-  }
-  q('eq-preview').innerHTML=prev;
-  logActivity(`Generó equipos aleatorios para ${g.asignatura?.nombre}`);
-}
+
+
 
 
 function rAdminCarga(){
@@ -1607,36 +1566,9 @@ function guardarActividad(gId,num){
   saveDB();alert(`✅ Actividad ${num} guardada.`);
 }
 
-function rDocEquipos(){
-  const g=getDocGrupo();if(!g)return '<div class="panel"><p>Sin grupo.</p></div>';
-  return `
-  <div class="panel">
-    <div class="panel-title"><i class="ti ti-arrows-shuffle"></i> Organizar equipos — ${g.asignatura?.nombre}</div>
-    <div class="fr c2">
-      <div class="fgg"><label>Integrantes por equipo</label>
-        <select id="deq-size"><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option><option value="6">6</option></select></div>
-      <div style="display:flex;align-items:flex-end">
-        <button class="btn btn-pu" onclick="generarEquiposDoc()"><i class="ti ti-dice"></i> Generar aleatoriamente</button>
-      </div>
-    </div>
-    <div id="deq-prev"></div>
-  </div>`;
-}
 
-function generarEquiposDoc(){
-  const g=getDocGrupo();if(!g)return;
-  const size=parseInt(q('deq-size').value)||5;
-  const mez=[...g.estudiantes].sort(()=>Math.random()-.5);
-  let eq=1;mez.forEach((e,i)=>{if(i>0&&i%size===0)eq++;e.equipo=String(eq);});
-  g.estudiantes=mez;saveDB();
-  const nEq=Math.ceil(mez.length/size);
-  let html=`<div class="info-box" style="margin-top:12px"><i class="ti ti-check"></i> ${nEq} equipos generados</div>`;
-  for(let i=1;i<=nEq;i++){
-    const m=mez.filter(e=>e.equipo==i);
-    html+=`<div class="panel" style="margin-top:10px"><div class="panel-title" style="font-size:13px">Equipo ${i}</div><ul style="list-style:none;display:flex;flex-direction:column;gap:4px">${m.map(e=>`<li style="font-size:12px;padding:4px 0;border-bottom:.5px solid var(--g100)">• ${e.nombresApellidos}</li>`).join('')}</ul></div>`;
-  }
-  q('deq-prev').innerHTML=html;
-}
+
+
 
 function rDocCarga(){
   return `<div class="panel">
