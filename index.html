@@ -414,6 +414,58 @@ table tbody tr:hover td{background:var(--g50)}
 .equipo-member-name{font-size:12px;color:var(--g700);font-weight:500}
 .equipo-member-doc{font-size:10px;color:var(--g400)}
 
+
+/* GESTIÓN EQUIPOS INLINE */
+.eq-select{border:1.5px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--g700);font-family:var(--f);outline:none;background:#fff;cursor:pointer;transition:border-color .2s;max-width:80px}
+.eq-select:focus{border-color:var(--ac)}
+.eq-select.changed{border-color:var(--go);background:#FFFBEB}
+
+/* TOAST NOTIFICACIÓN */
+.toast{position:fixed;bottom:24px;right:24px;background:#1E293B;color:#fff;padding:12px 20px;border-radius:var(--r);font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;transform:translateY(100px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.su{border-left:4px solid var(--su)}
+.toast.wa{border-left:4px solid var(--wa)}
+.toast.er{border-left:4px solid var(--ac)}
+
+/* CONFIG EQUIPOS MODAL */
+.eq-config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:14px}
+.eq-config-card{border:2px solid var(--g200);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .2s;text-align:center}
+.eq-config-card:hover{border-color:var(--ac);background:rgba(233,69,96,.04)}
+.eq-config-card.sel{border-color:var(--ac);background:rgba(233,69,96,.06)}
+.eq-config-num{font-size:28px;font-weight:800;color:var(--p);line-height:1}
+.eq-config-lbl{font-size:11px;color:var(--g500);margin-top:4px}
+
+/* SAVE BAR */
+.save-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid var(--ac);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 16px rgba(0,0,0,.08);z-index:100;display:none}
+.save-bar.visible{display:flex}
+.save-bar-msg{font-size:13px;color:var(--g600);display:flex;align-items:center;gap:6px}
+.save-bar-msg i{color:var(--go)}
+
+
+/* ═══════════════════════════════════════
+   KANBAN DRAG & DROP
+═══════════════════════════════════════ */
+.kanban-wrap{overflow-x:auto;padding-bottom:16px}
+.kanban-board{display:flex;gap:14px;min-width:max-content;padding:4px 2px 16px}
+.kanban-col{background:var(--g100);border-radius:var(--rl);padding:12px;width:220px;flex-shrink:0;min-height:200px;transition:background .2s}
+.kanban-col.drag-over{background:rgba(233,69,96,.08);border:2px dashed var(--ac)}
+.kanban-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.kanban-col-title{font-size:12px;font-weight:700;color:var(--g700);display:flex;align-items:center;gap:6px}
+.kanban-col-badge{background:var(--p);color:#fff;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700}
+.kanban-card{background:#fff;border:1.5px solid var(--g200);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;cursor:grab;transition:all .2s;user-select:none;display:flex;align-items:center;gap:8px}
+.kanban-card:hover{border-color:var(--ac);box-shadow:0 2px 8px rgba(233,69,96,.15);transform:translateY(-1px)}
+.kanban-card.dragging{opacity:.4;cursor:grabbing;transform:rotate(2deg)}
+.kanban-card.drag-placeholder{background:rgba(233,69,96,.05);border:2px dashed var(--ac);height:52px;border-radius:var(--r)}
+.kanban-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0}
+.kanban-name{font-size:11px;font-weight:600;color:var(--g800);line-height:1.3}
+.kanban-doc{font-size:10px;color:var(--g400)}
+.kanban-add-col{background:rgba(255,255,255,.6);border:2px dashed var(--g300);border-radius:var(--rl);padding:12px;width:180px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;min-height:120px;gap:8px}
+.kanban-add-col:hover{border-color:var(--ac);background:rgba(233,69,96,.04)}
+.kanban-add-col i{font-size:24px;color:var(--g300)}
+.kanban-add-col span{font-size:11px;color:var(--g400);font-weight:600}
+.kanban-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.kanban-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g500);padding:6px 12px;background:var(--g100);border-radius:20px}
+
 </style>
 </head>
 <body>
@@ -972,45 +1024,7 @@ function eliminarGrupo(id){
   saveDB();aN('grupos');
 }
 
-function rAdminEstudiantes(){
-  const todos=DB.grupos.flatMap(g=>(g.estudiantes||[]).map(e=>({...e,grupoNombre:g.asignatura?.nombre,grupoId:g.id,facultad:g.facultad})));
-  if(todos.length===0)return `<div class="panel"><p style="color:var(--g400)">No hay estudiantes cargados aún.</p></div>`;
-  const asigs=[...new Set(todos.map(e=>e.grupoNombre))].filter(Boolean);
-  const equips=[...new Set(todos.map(e=>e.equipo))].filter(Boolean).sort();
-  return `
-  <div class="panel">
-    <div class="panel-title"><i class="ti ti-user-edit"></i> Gestión de estudiantes (${todos.length})</div>
-    <div class="table-filters">
-      <input class="tf-input" id="tf-est-search" placeholder="🔍 Buscar por nombre, documento o correo..." oninput="filtrarEstudiantes()" style="min-width:280px">
-      <select class="tf-select" id="tf-est-asig" onchange="filtrarEstudiantes()">
-        <option value="">Todas las asignaturas</option>
-        ${asigs.map(a=>`<option>${a}</option>`).join('')}
-      </select>
-      <select class="tf-select" id="tf-est-eq" onchange="filtrarEstudiantes()">
-        <option value="">Todos los equipos</option>
-        ${equips.map(q=>`<option value="${q}">Equipo ${q}</option>`).join('')}
-      </select>
-    </div>
-  <div class="tw"><table><thead><tr><th>Nombre completo</th><th>Documento</th><th>Correo</th><th>Asignatura</th><th>Equipo</th><th>Evals.</th><th>Acciones</th></tr></thead>
-  <tbody>${todos.map(e=>{
-    const ev=calcEvalsEst(e.correo);
-    const pct=Math.round(ev/META_CERT*100);
-    return `<tr class="est-row" data-asig="${e.grupoNombre||''}" data-eq="${e.equipo||''}">
-      <td><b>${e.nombresApellidos}</b></td>
-      <td>${e.documento}</td>
-      <td style="font-size:11px">${e.correo}</td>
-      <td><small>${e.grupoNombre||'—'}</small></td>
-      <td><span class="badge bg-in">Eq. ${e.equipo||'—'}</span></td>
-      <td><span class="badge ${ev>=(DB.config.metaCert||40)?'bg-su':ev>20?'bg-wa':'bg-gy'}">${ev}/${DB.config.metaCert||40}</span></td>
-      <td>
-        <button class="btn btn-s btn-sm" title="Ver como estudiante" onclick="entrarComoUsuario('${e.correo}','${e.nombresApellidos}','estudiante')"><i class="ti ti-eye"></i></button>
-        <button class="btn btn-s btn-sm" onclick="abrirEditEst('${e.grupoId}','${e.correo}')"><i class="ti ti-edit"></i></button>
-        <button class="btn btn-s btn-sm" onclick="abrirMoverEquipo('${e.grupoId}','${e.correo}')"><i class="ti ti-arrows-shuffle"></i></button>
-        <button class="btn btn-da btn-sm" onclick="eliminarEstudiante('${e.grupoId}','${e.correo}')"><i class="ti ti-trash"></i></button>
-      </td>
-    </tr>`;
-  }).join('')}</tbody></table></div></div>`;
-}
+
 
 function abrirEditEst(gId,correo){
   const g=DB.grupos.find(x=>x.id===gId);
@@ -2822,37 +2836,7 @@ function continuar(){
 // ═══════════════════════════════════════════════════════
 // MÓDULO EQUIPOS MEJORADO — Visualización persistente
 // ═══════════════════════════════════════════════════════
-function rAdminEquipos(){
-  const grupos = DB.grupos;
-  const equiposExistentes = grupos.some(g => g.estudiantes.some(e => e.equipo));
 
-  return `
-  <div class="panel">
-    <div class="panel-title"><i class="ti ti-arrows-shuffle"></i> Organización aleatoria de equipos</div>
-    <p style="color:var(--g500);font-size:13px;margin-bottom:16px">Seleccione un grupo y genere equipos automáticamente de forma aleatoria.</p>
-    <div class="fr c2">
-      <div class="fgg"><label>Grupo</label>
-        <select id="eq-grupo" onchange="mostrarEquiposActuales()">
-          <option value="">Seleccione...</option>
-          ${grupos.map(g=>`<option value="${g.id}">${g.asignatura?.nombre} (${g.estudiantes?.length} est.)</option>`).join('')}
-        </select>
-      </div>
-      <div class="fgg"><label>Integrantes por equipo</label>
-        <select id="eq-size">
-          <option value="3">3 integrantes</option>
-          <option value="4">4 integrantes</option>
-          <option value="5" selected>5 integrantes</option>
-          <option value="6">6 integrantes</option>
-        </select>
-      </div>
-    </div>
-    <div class="btn-group">
-      <button class="btn btn-p" onclick="generarEquiposAleatorios()"><i class="ti ti-dice"></i> Generar aleatoriamente</button>
-      <button class="btn btn-s" onclick="mostrarEquiposActuales()"><i class="ti ti-eye"></i> Ver equipos actuales</button>
-    </div>
-    <div id="eq-preview"></div>
-  </div>`;
-}
 
 function mostrarEquiposActuales(){
   const gId = document.getElementById('eq-grupo')?.value;
@@ -3061,6 +3045,597 @@ window.addEventListener('popstate', function(e){
   history.pushState(null,'',window.location.pathname+'#');
 });
 
+
+// ═══════════════════════════════════════════════════════
+// TOAST NOTIFICACIONES
+// ═══════════════════════════════════════════════════════
+function showToast(msg, type='su', duration=3000){
+  const t = document.getElementById('toast');
+  const tm = document.getElementById('toast-msg');
+  if(!t||!tm) return;
+  t.className = `toast ${type}`;
+  tm.textContent = msg;
+  const icon = t.querySelector('i');
+  if(icon) icon.className = type==='su'?'ti ti-circle-check':type==='wa'?'ti ti-alert-triangle':'ti ti-alert-circle';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), duration);
+}
+
+// ═══════════════════════════════════════════════════════
+// GESTIÓN DE ESTUDIANTES MEJORADA CON EQUIPOS INLINE
+// ═══════════════════════════════════════════════════════
+let pendingChanges = {};
+
+function rAdminEstudiantes(){
+  const todos = DB.grupos.flatMap(g=>(g.estudiantes||[]).map(e=>({...e,grupoNombre:g.asignatura?.nombre,grupoId:g.id,facultad:g.facultad})));
+  if(todos.length===0) return `<div class="panel"><p style="color:var(--g400)">No hay estudiantes cargados aún.</p></div>`;
+  
+  const asigs=[...new Set(todos.map(e=>e.grupoNombre))].filter(Boolean);
+  const equips=[...new Set(todos.map(e=>e.equipo).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+  
+  // Calcular max equipos por grupo
+  const maxEq = Math.max(...DB.grupos.map(g=>{
+    const eqs = [...new Set(g.estudiantes.map(e=>e.equipo).filter(Boolean))];
+    return eqs.length || 5;
+  }), 5);
+  const eqOptions = Array.from({length: maxEq+3}, (_,i)=>i+1).map(n=>`<option value="${n}">Eq. ${n}</option>`).join('');
+
+  return `
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-user-edit"></i> Gestión de estudiantes (${todos.length})</div>
+    
+    <!-- FILTROS -->
+    <div class="table-filters">
+      <input class="tf-input" id="tf-est-search" placeholder="🔍 Nombre, documento o correo..." oninput="filtrarEstudiantes()" style="min-width:240px">
+      <select class="tf-select" id="tf-est-asig" onchange="filtrarEstudiantes()">
+        <option value="">Todas las asignaturas</option>
+        ${asigs.map(a=>`<option>${a}</option>`).join('')}
+      </select>
+      <select class="tf-select" id="tf-est-eq" onchange="filtrarEstudiantes()">
+        <option value="">Todos los equipos</option>
+        ${equips.map(q=>`<option value="${q}">Equipo ${q}</option>`).join('')}
+      </select>
+      <button class="btn btn-p btn-sm" onclick="abrirConfigEquipos()"><i class="ti ti-layout-grid"></i> Configurar equipos</button>
+    </div>
+
+    <!-- BOTÓN GUARDAR CAMBIOS -->
+    <div id="save-bar-est" class="save-bar">
+      <div class="save-bar-msg"><i class="ti ti-pencil"></i> Tiene cambios sin guardar en los equipos</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-s btn-sm" onclick="descartarCambios()"><i class="ti ti-x"></i> Descartar</button>
+        <button class="btn btn-p btn-sm" onclick="guardarCambiosEquipos()"><i class="ti ti-device-floppy"></i> Guardar cambios</button>
+      </div>
+    </div>
+
+    <div class="tw"><table><thead><tr>
+      <th>Nombre completo</th><th>Documento</th><th>Correo</th>
+      <th>Asignatura</th><th>Equipo</th><th>Evals.</th><th>Acciones</th>
+    </tr></thead>
+    <tbody>${todos.map(e=>{
+      const ev = calcEvalsEst(e.correo);
+      const meta = DB.config.metaCert||40;
+      return `<tr class="est-row" data-asig="${e.grupoNombre||''}" data-eq="${e.equipo||''}" data-gid="${e.grupoId}" data-correo="${e.correo}">
+        <td><b>${e.nombresApellidos}</b></td>
+        <td style="font-size:11px">${e.documento}</td>
+        <td style="font-size:11px;color:var(--g500)">${e.correo}</td>
+        <td style="font-size:11px">${e.grupoNombre||'—'}</td>
+        <td>
+          <select class="eq-select" 
+            data-correo="${e.correo}" data-gid="${e.grupoId}" data-orig="${e.equipo||''}"
+            onchange="marcarCambioEquipo(this)">
+            <option value="">Sin equipo</option>
+            ${Array.from({length:20},(_,i)=>i+1).map(n=>`<option value="${n}" ${e.equipo==n?'selected':''}>Eq. ${n}</option>`).join('')}
+          </select>
+        </td>
+        <td><span class="badge ${ev>=meta?'bg-su':ev>0?'bg-wa':'bg-gy'}">${ev}/${meta}</span></td>
+        <td>
+          <button class="btn btn-s btn-sm" title="Ver como estudiante" onclick="entrarComoUsuario('${e.correo}','${e.nombresApellidos}','estudiante')"><i class="ti ti-eye"></i></button>
+          <button class="btn btn-s btn-sm" onclick="abrirEditEst('${e.grupoId}','${e.correo}')"><i class="ti ti-edit"></i></button>
+          <button class="btn btn-da btn-sm" onclick="confirmarEliminarEquipo('${e.grupoId}','${e.correo}','${e.nombresApellidos}')"><i class="ti ti-user-minus"></i></button>
+        </td>
+      </tr>`;
+    }).join('')}</tbody></table></div>
+  </div>`;
+}
+
+function marcarCambioEquipo(sel){
+  const correo = sel.dataset.correo;
+  const gid = sel.dataset.gid;
+  const orig = sel.dataset.orig;
+  const newVal = sel.value;
+  
+  if(newVal !== orig){
+    sel.classList.add('changed');
+    pendingChanges[correo] = {gid, equipo: newVal};
+  } else {
+    sel.classList.remove('changed');
+    delete pendingChanges[correo];
+  }
+  
+  // Mostrar/ocultar barra de guardar
+  const bar = document.getElementById('save-bar-est');
+  if(bar){
+    if(Object.keys(pendingChanges).length > 0){
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+}
+
+function guardarCambiosEquipos(){
+  let count = 0;
+  for(const [correo, change] of Object.entries(pendingChanges)){
+    const g = DB.grupos.find(x=>x.id===change.gid);
+    const est = g?.estudiantes?.find(e=>e.correo===correo);
+    if(est){
+      est.equipo = change.equipo;
+      count++;
+    }
+  }
+  pendingChanges = {};
+  saveDB();
+  
+  // Limpiar estilos changed
+  document.querySelectorAll('.eq-select.changed').forEach(s=>{
+    s.classList.remove('changed');
+    s.dataset.orig = s.value;
+  });
+  
+  const bar = document.getElementById('save-bar-est');
+  if(bar) bar.classList.remove('visible');
+  
+  showToast(`✅ ${count} cambio(s) de equipo guardados correctamente`);
+  logActivity(`Actualizó equipos de ${count} estudiantes`);
+}
+
+function descartarCambios(){
+  // Restaurar valores originales
+  document.querySelectorAll('.eq-select.changed').forEach(sel=>{
+    sel.value = sel.dataset.orig;
+    sel.classList.remove('changed');
+  });
+  pendingChanges = {};
+  const bar = document.getElementById('save-bar-est');
+  if(bar) bar.classList.remove('visible');
+  showToast('Cambios descartados', 'wa');
+}
+
+function confirmarEliminarEquipo(gId, correo, nombre){
+  if(!confirm(`¿Quitar a ${nombre} de su equipo actual?\n\nEl estudiante quedará sin equipo asignado.`)) return;
+  const g = DB.grupos.find(x=>x.id===gId);
+  const est = g?.estudiantes?.find(e=>e.correo===correo);
+  if(est){ est.equipo = ''; saveDB(); }
+  showToast(`${nombre} removido del equipo`);
+  aN('estudiantes');
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL CONFIGURAR EQUIPOS
+// ═══════════════════════════════════════════════════════
+function abrirConfigEquipos(){
+  const modal = document.getElementById('modal-config-equipos');
+  if(!modal) return;
+  // Llenar selector de grupos
+  const sel = document.getElementById('ceq-grupo');
+  if(sel){
+    sel.innerHTML = '<option value="">Seleccione un grupo...</option>' +
+      DB.grupos.map(g=>`<option value="${g.id}">${g.asignatura?.nombre} (${g.estudiantes.length} est.)</option>`).join('');
+  }
+  openModal('modal-config-equipos');
+}
+
+function previewConfigEquipos(){
+  const gId = document.getElementById('ceq-grupo')?.value;
+  const modo = document.getElementById('ceq-modo')?.value;
+  const n = parseInt(document.getElementById('ceq-n')?.value)||5;
+  const preview = document.getElementById('ceq-preview');
+  if(!gId||!preview){ if(preview) preview.innerHTML=''; return; }
+  
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  
+  let numEquipos, porEquipo;
+  if(modo==='cantidad'){
+    numEquipos = n;
+    porEquipo = Math.ceil(g.estudiantes.length / n);
+  } else {
+    porEquipo = n;
+    numEquipos = Math.ceil(g.estudiantes.length / n);
+  }
+  
+  preview.innerHTML = `<div class="info-box" style="margin-top:12px">
+    <i class="ti ti-info-circle"></i>
+    Se crearán <b>${numEquipos} equipos</b> de aproximadamente <b>${porEquipo} integrantes</b> 
+    para <b>${g.estudiantes.length}</b> estudiantes de ${g.asignatura?.nombre}
+  </div>`;
+}
+
+function aplicarConfigEquipos(){
+  const gId = document.getElementById('ceq-grupo')?.value;
+  const modo = document.getElementById('ceq-modo')?.value;
+  const n = parseInt(document.getElementById('ceq-n')?.value)||5;
+  const tipo = document.querySelector('input[name="ceq-tipo"]:checked')?.value||'aleatorio';
+  
+  if(!gId){ alert('Seleccione un grupo.'); return; }
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  
+  let estudiantes = tipo==='aleatorio' 
+    ? [...g.estudiantes].sort(()=>Math.random()-.5)
+    : [...g.estudiantes].sort((a,b)=>a.nombresApellidos.localeCompare(b.nombresApellidos));
+  
+  let porEquipo = modo==='cantidad' 
+    ? Math.ceil(g.estudiantes.length/n) 
+    : n;
+  
+  let eq = 1;
+  estudiantes.forEach((est,i)=>{
+    if(i>0 && i%porEquipo===0) eq++;
+    est.equipo = String(eq);
+  });
+  g.estudiantes = estudiantes;
+  saveDB();
+  
+  const numEq = Math.ceil(g.estudiantes.length/porEquipo);
+  closeModal('modal-config-equipos');
+  showToast(`✅ ${numEq} equipos configurados para ${g.asignatura?.nombre}`);
+  logActivity(`Configuró ${numEq} equipos para ${g.asignatura?.nombre}`);
+  aN('estudiantes');
+}
+
+// saveDB ya está definido globalmente con soporte Supabase
+
+
+// ═══════════════════════════════════════════════════════
+// KANBAN DRAG & DROP — MÓDULO EQUIPOS
+// ═══════════════════════════════════════════════════════
+let kanbanDragSrc = null;
+let kanbanDragData = null;
+let kanbanGrupoId = null;
+let kanbanChanges = false;
+
+function rAdminEquipos(){
+  return `
+  <div class="panel">
+    <div class="panel-title"><i class="ti ti-layout-kanban"></i> Gestión visual de equipos</div>
+    <p style="color:var(--g500);font-size:13px;margin-bottom:16px">
+      Seleccione un grupo y organice los equipos arrastrando estudiantes entre columnas, o cambie el número de equipo manualmente.
+    </p>
+    <div class="kanban-toolbar">
+      <div class="fgg" style="min-width:280px">
+        <label style="font-size:11px;font-weight:600;color:var(--g600)">Grupo</label>
+        <select id="kb-grupo" onchange="cargarKanban()" style="border:1.5px solid var(--g200);border-radius:6px;padding:8px 11px;font-size:12px;color:var(--g800);outline:none;font-family:var(--f);background:#fff;width:100%">
+          <option value="">Seleccione un grupo...</option>
+          ${DB.grupos.map(g=>`<option value="${g.id}">${g.asignatura?.nombre} (${g.estudiantes?.length} est.)</option>`).join('')}
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <button class="btn btn-p btn-sm" onclick="generarEquiposKanban()"><i class="ti ti-dice"></i> Generar aleatorio</button>
+        <button class="btn btn-s btn-sm" onclick="agregarEquipoKanban()"><i class="ti ti-plus"></i> Nuevo equipo</button>
+        <button class="btn btn-su btn-sm" id="kb-save-btn" onclick="guardarKanban()" style="display:none"><i class="ti ti-device-floppy"></i> Guardar cambios</button>
+      </div>
+    </div>
+    <div class="kanban-legend">
+      <i class="ti ti-drag-drop"></i> Arrastra las tarjetas entre equipos para mover estudiantes
+    </div>
+    <div id="kb-board" class="kanban-wrap" style="margin-top:14px">
+      <div style="padding:40px;text-align:center;color:var(--g400)">
+        <i class="ti ti-users-group" style="font-size:36px;display:block;margin-bottom:8px"></i>
+        Seleccione un grupo para ver y organizar sus equipos
+      </div>
+    </div>
+  </div>`;
+}
+
+function cargarKanban(){
+  const gId = document.getElementById('kb-grupo')?.value;
+  if(!gId){ document.getElementById('kb-board').innerHTML = ''; return; }
+  kanbanGrupoId = gId;
+  kanbanChanges = false;
+  renderKanbanBoard(gId);
+}
+
+function renderKanbanBoard(gId){
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  const board = document.getElementById('kb-board');
+  if(!board) return;
+
+  // Obtener equipos ordenados
+  const equipos = [...new Set(g.estudiantes.map(e=>e.equipo).filter(Boolean))]
+    .sort((a,b)=>Number(a)-Number(b));
+  const sinEquipo = g.estudiantes.filter(e=>!e.equipo);
+
+  let html = '<div class="kanban-board" id="kb-columns">';
+
+  // Columna sin equipo (si hay)
+  if(sinEquipo.length > 0){
+    html += renderKanbanCol('sin-equipo', 'Sin equipo', sinEquipo, '#94A3B8', g);
+  }
+
+  // Columnas de equipos
+  equipos.forEach(eq => {
+    const miembros = g.estudiantes.filter(e=>e.equipo==eq);
+    html += renderKanbanCol(eq, `Equipo ${eq}`, miembros, AVC[Number(eq)%AVC.length], g);
+  });
+
+  // Botón agregar equipo
+  html += `<div class="kanban-add-col" onclick="agregarEquipoKanban()">
+    <i class="ti ti-plus"></i>
+    <span>Nuevo equipo</span>
+  </div>`;
+
+  html += '</div>';
+  board.innerHTML = html;
+
+  // Activar drag & drop
+  initKanbanDnD();
+  
+  // Actualizar botón guardar
+  const saveBtn = document.getElementById('kb-save-btn');
+  if(saveBtn) saveBtn.style.display = 'flex';
+}
+
+function renderKanbanCol(eq, title, miembros, color, g){
+  const colId = `col-eq-${eq}`;
+  return `
+  <div class="kanban-col" id="${colId}" 
+    data-eq="${eq}"
+    ondragover="kbDragOver(event,this)" 
+    ondragleave="kbDragLeave(this)"
+    ondrop="kbDrop(event,this)">
+    <div class="kanban-col-header">
+      <div class="kanban-col-title">
+        <div style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></div>
+        ${title}
+      </div>
+      <span class="kanban-col-badge" style="background:${color}">${miembros.length}</span>
+    </div>
+    ${miembros.map((e,i)=>renderKanbanCard(e, i, color)).join('')}
+    ${eq==='sin-equipo'?'':`
+    <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--g200)">
+      <div style="font-size:10px;color:var(--g400);text-align:center">
+        <i class="ti ti-drag-drop"></i> Suelta aquí para mover
+      </div>
+    </div>`}
+  </div>`;
+}
+
+function renderKanbanCard(est, idx, color){
+  return `
+  <div class="kanban-card" 
+    draggable="true"
+    data-correo="${est.correo}"
+    data-eq="${est.equipo||''}"
+    ondragstart="kbDragStart(event,this)"
+    ondragend="kbDragEnd(this)">
+    <div class="kanban-avatar" style="background:${color}">${ini(est.nombresApellidos)}</div>
+    <div style="flex:1;min-width:0">
+      <div class="kanban-name">${est.nombresApellidos.split(' ').slice(0,3).join(' ')}</div>
+      <div class="kanban-doc">${est.documento}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <button onclick="kbMoverManual('${est.correo}')" title="Cambiar equipo manualmente"
+        style="background:none;border:none;cursor:pointer;color:var(--g400);padding:2px;font-size:12px">
+        <i class="ti ti-edit"></i>
+      </button>
+    </div>
+  </div>`;
+}
+
+// ── DRAG & DROP HANDLERS ─────────────────────────────────
+function initKanbanDnD(){
+  // Ya inicializado con atributos HTML
+}
+
+function kbDragStart(e, card){
+  kanbanDragData = {
+    correo: card.dataset.correo,
+    fromEq: card.dataset.eq
+  };
+  card.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', card.dataset.correo);
+}
+
+function kbDragEnd(card){
+  card.classList.remove('dragging');
+  document.querySelectorAll('.kanban-col').forEach(c=>c.classList.remove('drag-over'));
+}
+
+function kbDragOver(e, col){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.kanban-col').forEach(c=>c.classList.remove('drag-over'));
+  col.classList.add('drag-over');
+}
+
+function kbDragLeave(col){
+  col.classList.remove('drag-over');
+}
+
+function kbDrop(e, col){
+  e.preventDefault();
+  col.classList.remove('drag-over');
+  if(!kanbanDragData || !kanbanGrupoId) return;
+  
+  const toEq = col.dataset.eq;
+  const correo = kanbanDragData.correo;
+  const fromEq = kanbanDragData.fromEq;
+  
+  if(toEq === fromEq) return; // Mismo equipo, no hacer nada
+  
+  // Actualizar en DB local
+  const g = DB.grupos.find(x=>x.id===kanbanGrupoId);
+  const est = g?.estudiantes?.find(e=>e.correo===correo);
+  if(est){
+    est.equipo = toEq === 'sin-equipo' ? '' : toEq;
+    kanbanChanges = true;
+  }
+  kanbanDragData = null;
+  
+  // Re-renderizar el tablero
+  renderKanbanBoard(kanbanGrupoId);
+  
+  // Mostrar feedback
+  const nombre = est?.nombresApellidos?.split(' ').slice(0,2).join(' ') || correo;
+  showToast(`${nombre} movido a ${toEq==='sin-equipo'?'sin equipo':'Equipo '+toEq}`, 'wa', 2000);
+}
+
+// ── MOVER MANUAL ─────────────────────────────────────────
+function kbMoverManual(correo){
+  const g = DB.grupos.find(x=>x.id===kanbanGrupoId);
+  const est = g?.estudiantes?.find(e=>e.correo===correo);
+  if(!est) return;
+  
+  const equipos = [...new Set(g.estudiantes.map(e=>e.equipo).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+  const nuevoEq = prompt(
+    `Mover a ${est.nombresApellidos.split(' ').slice(0,2).join(' ')}\n\nEquipos disponibles: ${equipos.join(', ')}\n\nIngrese el número del nuevo equipo:`,
+    est.equipo || '1'
+  );
+  
+  if(nuevoEq === null) return; // Canceló
+  est.equipo = nuevoEq.trim();
+  kanbanChanges = true;
+  renderKanbanBoard(kanbanGrupoId);
+  showToast(`Movido a Equipo ${nuevoEq}`, 'wa', 2000);
+}
+
+// ── AGREGAR NUEVO EQUIPO ──────────────────────────────────
+function agregarEquipoKanban(){
+  const gId = document.getElementById('kb-grupo')?.value || kanbanGrupoId;
+  if(!gId){ showToast('Seleccione un grupo primero', 'wa'); return; }
+  kanbanGrupoId = gId;
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  
+  const equipos = [...new Set(g.estudiantes.map(e=>e.equipo).filter(Boolean))].map(Number);
+  const nextEq = String(equipos.length > 0 ? Math.max(...equipos) + 1 : 1);
+  
+  // Agregar columna vacía
+  const board = document.getElementById('kb-columns');
+  if(!board) { renderKanbanBoard(gId); return; }
+  
+  const addBtn = board.querySelector('.kanban-add-col');
+  const newCol = document.createElement('div');
+  newCol.className = 'kanban-col';
+  newCol.id = `col-eq-${nextEq}`;
+  newCol.dataset.eq = nextEq;
+  newCol.setAttribute('ondragover', `kbDragOver(event,this)`);
+  newCol.setAttribute('ondragleave', `kbDragLeave(this)`);
+  newCol.setAttribute('ondrop', `kbDrop(event,this)`);
+  newCol.innerHTML = `
+    <div class="kanban-col-header">
+      <div class="kanban-col-title">
+        <div style="width:10px;height:10px;border-radius:50%;background:${AVC[Number(nextEq)%AVC.length]};flex-shrink:0"></div>
+        Equipo ${nextEq}
+      </div>
+      <span class="kanban-col-badge" style="background:${AVC[Number(nextEq)%AVC.length]}">0</span>
+    </div>
+    <div style="padding:20px;text-align:center;color:var(--g400);font-size:11px">
+      <i class="ti ti-drag-drop" style="display:block;font-size:20px;margin-bottom:4px"></i>
+      Arrastra estudiantes aquí
+    </div>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--g200)">
+      <div style="font-size:10px;color:var(--g400);text-align:center">
+        <i class="ti ti-drag-drop"></i> Suelta aquí para mover
+      </div>
+    </div>`;
+  
+  board.insertBefore(newCol, addBtn);
+  showToast(`Equipo ${nextEq} agregado — arrastra estudiantes aquí`, 'su', 2500);
+}
+
+// ── GENERAR ALEATORIO DESDE KANBAN ───────────────────────
+function generarEquiposKanban(){
+  const gId = document.getElementById('kb-grupo')?.value;
+  if(!gId){ showToast('Seleccione un grupo primero', 'wa'); return; }
+  
+  const g = DB.grupos.find(x=>x.id===gId);
+  if(!g) return;
+  
+  const size = 5; // Por defecto 5, se puede cambiar
+  const mez = [...g.estudiantes].sort(()=>Math.random()-.5);
+  let eq = 1;
+  mez.forEach((e,i)=>{ if(i>0&&i%size===0) eq++; e.equipo=String(eq); });
+  g.estudiantes = mez;
+  kanbanGrupoId = gId;
+  kanbanChanges = true;
+  renderKanbanBoard(gId);
+  showToast(`Equipos generados aleatoriamente`, 'su');
+}
+
+// ── GUARDAR KANBAN ────────────────────────────────────────
+function guardarKanban(){
+  if(!kanbanGrupoId) return;
+  saveDB();
+  kanbanChanges = false;
+  logActivity(`Guardó organización de equipos`);
+  showToast('✅ Equipos guardados correctamente');
+}
+
 </script>
+
+<!-- TOAST NOTIFICACIÓN -->
+<div id="toast" class="toast"><i class="ti ti-circle-check"></i><span id="toast-msg">Guardado</span></div>
+
+
+<!-- MODAL CONFIGURAR EQUIPOS -->
+<div class="modal-bg" id="modal-config-equipos">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">
+      <span><i class="ti ti-layout-grid" style="color:var(--ac)"></i> Configurar equipos</span>
+      <span class="modal-close" onclick="closeModal('modal-config-equipos')"><i class="ti ti-x"></i></span>
+    </div>
+    
+    <div class="fr">
+      <div class="fgg">
+        <label>Grupo a configurar</label>
+        <select id="ceq-grupo" onchange="previewConfigEquipos()">
+          <option value="">Seleccione un grupo...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fr c2">
+      <div class="fgg">
+        <label>Configurar por</label>
+        <select id="ceq-modo" onchange="previewConfigEquipos()">
+          <option value="integrantes">Integrantes por equipo</option>
+          <option value="cantidad">Cantidad de equipos</option>
+        </select>
+      </div>
+      <div class="fgg">
+        <label>Número</label>
+        <input type="number" id="ceq-n" value="5" min="2" max="20" oninput="previewConfigEquipos()">
+      </div>
+    </div>
+
+    <div class="fr">
+      <div class="fgg">
+        <label>Tipo de asignación</label>
+        <div style="display:flex;gap:16px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+            <input type="radio" name="ceq-tipo" value="aleatorio" checked> Aleatoria
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+            <input type="radio" name="ceq-tipo" value="alfabetico"> Alfabética
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="ceq-preview"></div>
+
+    <div class="btn-group" style="margin-top:16px">
+      <button class="btn btn-p" onclick="aplicarConfigEquipos()">
+        <i class="ti ti-check"></i> Aplicar configuración
+      </button>
+      <button class="btn btn-s" onclick="closeModal('modal-config-equipos')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
