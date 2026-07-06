@@ -837,12 +837,14 @@ function launchAdmin(){
   q('a-sub').textContent=APP.session.nombre;
   showScreen('s-admin');
   NAV_HISTORY.admin = [];
-  initHistoryState('admin', 'bienvenida');
-  _aN_orig('bienvenida');
-  renderBreadcrumbAdmin('bienvenida');
+  history.replaceState({role:'admin',sec:'bienvenida'}, '', '#admin/bienvenida');
+  aN('bienvenida');
 }
 
 function aN(sec){
+  // Guardar en historial si cambia de sección
+  if(APP.aSection && APP.aSection!==sec) NAV_HISTORY.admin.push(APP.aSection);
+  if(NAV_HISTORY.admin.length>15) NAV_HISTORY.admin.shift();
   APP.aSection=sec;
   document.querySelectorAll('#a-side .sb-item').forEach(i=>i.classList.remove('act','go'));
   const el=q('sa-'+sec);if(el){el.classList.add('act','go');}
@@ -857,7 +859,7 @@ function aN(sec){
     periodos:rAdminPeriodos
   };
   m.innerHTML=(renders[sec]||rAdminDash)();
-  setTimeout(()=>postRenderAdmin(sec),100);
+  setTimeout(()=>{postRenderAdmin(sec);renderBreadcrumbAdmin(sec);},100);
 }
 
 function rAdminDash(){
@@ -1519,12 +1521,13 @@ function launchDocente(){
   const badge=q('d-alert-badge');if(badge)badge.textContent=alerts.length;
   showScreen('s-doc');
   NAV_HISTORY.doc = [];
-  initHistoryState('doc', 'bienvenida');
-  _dN_orig('bienvenida');
-  renderBreadcrumbDoc('bienvenida');
+  history.replaceState({role:'doc',sec:'bienvenida'}, '', '#doc/bienvenida');
+  dN('bienvenida');
 }
 
 function dN(sec){
+  if(APP.dSection && APP.dSection!==sec) NAV_HISTORY.doc.push(APP.dSection);
+  if(NAV_HISTORY.doc.length>15) NAV_HISTORY.doc.shift();
   APP.dSection=sec;
   document.querySelectorAll('#s-doc .sb-item').forEach(i=>i.classList.remove('act','pu'));
   const el=q('sd-'+sec);if(el){el.classList.add('act','pu');}
@@ -1532,6 +1535,7 @@ function dN(sec){
   const m=q('d-main');
   const renders={bienvenida:rDocenteBienvenida,migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion};
   m.innerHTML=(renders[sec]||rDocGrupo)();
+  setTimeout(()=>renderBreadcrumbDoc(sec),100);
   if(sec==='reporte')setTimeout(()=>renderDocCharts(),100);
 }
 
@@ -1749,7 +1753,7 @@ function launchEstudiante(){
   APP.ratings={};APP.instrE={};APP.instrS={};APP.curComp=0;
   getAllPersonas().forEach(p=>{APP.ratings[p.correo]={};COMPETENCIAS.forEach((_,ci)=>{APP.ratings[p.correo][ci]={};});});
   showScreen('s-est');
-  initHistoryState('est', 'inicio');
+  history.replaceState({role:'est'}, '', '#est/inicio');
   // Mostrar bienvenida primero
   renderBienvenidaEst();
 }
@@ -2171,7 +2175,7 @@ function showLoading(show){
     el.id = 'loading-overlay';
     el.style.cssText = 'position:fixed;inset:0;background:rgba(26,26,46,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:var(--f)';
     el.innerHTML = '<div style="font-size:36px;margin-bottom:16px;animation:spin 1s linear infinite">⚙️</div><div style="font-size:14px;font-weight:600">Conectando con la base de datos...</div><div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:6px">Habilidades del Siglo XXI</div>';
-    document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
+    document.head.document.head.insertAdjacentHTML('beforeend','<style>@keyframes spin{to{transform:rotate(360deg)}}</style>');
     document.body.appendChild(el);
   } else if(!show && el) {
     el.remove();
@@ -2884,184 +2888,6 @@ function continuar(){
 
 
 // ═══════════════════════════════════════════════════════
-// SISTEMA DE NAVEGACIÓN CON HISTORIAL Y BREADCRUMB
-// ═══════════════════════════════════════════════════════
-
-// Mapa de etiquetas para el breadcrumb
-const NAV_LABELS_ADMIN = {
-  bienvenida: {label:'Inicio', icon:'ti-home'},
-  dashboard:  {label:'Dashboard', icon:'ti-layout-dashboard'},
-  grupos:     {label:'Grupos', icon:'ti-users-group'},
-  carga:      {label:'Carga masiva', icon:'ti-file-upload'},
-  estudiantes:{label:'Estudiantes', icon:'ti-user-edit'},
-  equipos:    {label:'Equipos', icon:'ti-arrows-shuffle'},
-  reportes:   {label:'Reportes', icon:'ti-chart-bar'},
-  certificados:{label:'Certificados', icon:'ti-certificate'},
-  instrumentos:{label:'Instrumentos', icon:'ti-clipboard-list'},
-  periodos:   {label:'Períodos', icon:'ti-calendar'},
-  config:     {label:'Configuración', icon:'ti-settings'}
-};
-
-const NAV_LABELS_DOC = {
-  bienvenida:  {label:'Inicio', icon:'ti-home'},
-  migrupo:     {label:'Mi grupo', icon:'ti-users'},
-  actividades: {label:'Actividades', icon:'ti-flag'},
-  equipos:     {label:'Equipos', icon:'ti-arrows-shuffle'},
-  carga:       {label:'Cargar estudiantes', icon:'ti-file-upload'},
-  reporte:     {label:'Reporte', icon:'ti-chart-bar'},
-  alertas:     {label:'Alertas', icon:'ti-alert-triangle'},
-  observacion: {label:'Mi observación', icon:'ti-message-circle'}
-};
-
-// Historial de navegación por rol
-let NAV_HISTORY = {admin:[], doc:[]};
-
-// ── ADMIN NAVEGACIÓN CON HISTORIAL ──────────────────────
-const _aN_orig = aN;
-function aN(sec){
-  // Agregar al historial si es diferente al actual
-  if(APP.aSection !== sec){
-    NAV_HISTORY.admin.push(APP.aSection);
-    if(NAV_HISTORY.admin.length > 10) NAV_HISTORY.admin.shift();
-  }
-  _aN_orig(sec);
-  renderBreadcrumbAdmin(sec);
-  // Actualizar URL hash sin recargar
-  history.pushState({role:'admin', sec}, '', '#admin/' + sec);
-}
-
-function renderBreadcrumbAdmin(sec){
-  const bar = document.getElementById('a-breadcrumb');
-  if(!bar) return;
-  const info = NAV_LABELS_ADMIN[sec] || {label: sec, icon:'ti-circle'};
-  const hasPrev = NAV_HISTORY.admin.length > 0;
-  const prevSec = NAV_HISTORY.admin[NAV_HISTORY.admin.length - 1];
-  const prevInfo = NAV_LABELS_ADMIN[prevSec] || {label: prevSec, icon:'ti-circle'};
-
-  bar.style.display = 'flex';
-  bar.innerHTML = `
-    ${hasPrev && sec !== 'bienvenida' ? `
-      <button class="bc-back" onclick="aN_back_admin()">
-        <i class="ti ti-arrow-left"></i> Volver
-      </button>` : ''}
-    <div class="bc-item" onclick="aN('bienvenida')" title="Ir al inicio">
-      <i class="ti ti-home" style="font-size:12px"></i> H21
-    </div>
-    ${sec !== 'bienvenida' ? `
-      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
-      <div class="bc-item active">
-        <i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}
-      </div>` : `
-      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
-      <div class="bc-item active">
-        <i class="ti ti-home" style="font-size:12px"></i> Inicio
-      </div>`}
-  `;
-}
-
-function aN_back_admin(){
-  if(NAV_HISTORY.admin.length === 0) return;
-  const prev = NAV_HISTORY.admin.pop();
-  _aN_orig(prev);
-  renderBreadcrumbAdmin(prev);
-  history.pushState({role:'admin', sec:prev}, '', '#admin/' + prev);
-}
-
-// ── DOCENTE NAVEGACIÓN CON HISTORIAL ────────────────────
-const _dN_orig = dN;
-function dN(sec){
-  if(APP.dSection !== sec){
-    NAV_HISTORY.doc.push(APP.dSection);
-    if(NAV_HISTORY.doc.length > 10) NAV_HISTORY.doc.shift();
-  }
-  _dN_orig(sec);
-  renderBreadcrumbDoc(sec);
-  history.pushState({role:'doc', sec}, '', '#doc/' + sec);
-}
-
-function renderBreadcrumbDoc(sec){
-  const bar = document.getElementById('d-breadcrumb');
-  if(!bar) return;
-  const info = NAV_LABELS_DOC[sec] || {label: sec, icon:'ti-circle'};
-  const hasPrev = NAV_HISTORY.doc.length > 0;
-
-  bar.style.display = 'flex';
-  bar.innerHTML = `
-    ${hasPrev && sec !== 'bienvenida' ? `
-      <button class="bc-back" onclick="dN_back_doc()">
-        <i class="ti ti-arrow-left"></i> Volver
-      </button>` : ''}
-    <div class="bc-item" onclick="dN('bienvenida')" title="Ir al inicio">
-      <i class="ti ti-home" style="font-size:12px"></i> H21
-    </div>
-    ${sec !== 'bienvenida' ? `
-      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
-      <div class="bc-item active">
-        <i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}
-      </div>` : `
-      <span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
-      <div class="bc-item active">
-        <i class="ti ti-home" style="font-size:12px"></i> Inicio
-      </div>`}
-  `;
-}
-
-function dN_back_doc(){
-  if(NAV_HISTORY.doc.length === 0) return;
-  const prev = NAV_HISTORY.doc.pop();
-  _dN_orig(prev);
-  renderBreadcrumbDoc(prev);
-  history.pushState({role:'doc', sec:prev}, '', '#doc/' + prev);
-}
-
-// ── INTERCEPTAR BOTÓN ATRÁS DEL NAVEGADOR ───────────────
-window.addEventListener('popstate', function(e){
-  if(!APP.session) return; // Si no hay sesión, dejar comportamiento normal
-  e.preventDefault && e.preventDefault();
-  
-  const state = e.state;
-  if(state && state.role === 'admin' && APP.session.rol === 'admin'){
-    if(NAV_HISTORY.admin.length > 0){
-      const prev = NAV_HISTORY.admin.pop();
-      _aN_orig(prev);
-      renderBreadcrumbAdmin(prev);
-    } else {
-      _aN_orig('bienvenida');
-      renderBreadcrumbAdmin('bienvenida');
-    }
-  } else if(state && state.role === 'doc' && APP.session.rol === 'docente'){
-    if(NAV_HISTORY.doc.length > 0){
-      const prev = NAV_HISTORY.doc.pop();
-      _dN_orig(prev);
-      renderBreadcrumbDoc(prev);
-    } else {
-      _dN_orig('bienvenida');
-      renderBreadcrumbDoc('bienvenida');
-    }
-  } else {
-    // Evitar salir del sistema — regresar al inicio del rol actual
-    if(APP.session?.rol === 'admin'){
-      _aN_orig('bienvenida');
-      renderBreadcrumbAdmin('bienvenida');
-      history.pushState({role:'admin', sec:'bienvenida'}, '', '#admin/bienvenida');
-    } else if(APP.session?.rol === 'docente'){
-      _dN_orig('bienvenida');
-      renderBreadcrumbDoc('bienvenida');
-      history.pushState({role:'doc', sec:'bienvenida'}, '', '#doc/bienvenida');
-    } else if(APP.session?.rol === 'estudiante'){
-      // Estudiante — volver a bienvenida
-      renderBienvenidaEst();
-      history.pushState({role:'est'}, '', '#est/inicio');
-    }
-  }
-});
-
-// Inicializar history state al entrar
-function initHistoryState(role, sec){
-  history.replaceState({role, sec}, '', '#' + role + '/' + sec);
-}
-
-// ═══════════════════════════════════════════════════════
 // MÓDULO EQUIPOS MEJORADO — Visualización persistente
 // ═══════════════════════════════════════════════════════
 function rAdminEquipos(){
@@ -3217,6 +3043,91 @@ function rDocGrupoEquipoCards(g){
   html += '</div>';
   return html;
 }
+
+
+// ═══════════════════════════════════════════════════════
+// BREADCRUMB Y HISTORIAL DE NAVEGACIÓN
+// ═══════════════════════════════════════════════════════
+const NAV_LABELS_ADMIN = {
+  bienvenida:{label:'Inicio',icon:'ti-home'},
+  dashboard:{label:'Dashboard',icon:'ti-layout-dashboard'},
+  grupos:{label:'Grupos',icon:'ti-users-group'},
+  carga:{label:'Carga masiva',icon:'ti-file-upload'},
+  estudiantes:{label:'Estudiantes',icon:'ti-user-edit'},
+  equipos:{label:'Equipos',icon:'ti-arrows-shuffle'},
+  reportes:{label:'Reportes',icon:'ti-chart-bar'},
+  certificados:{label:'Certificados',icon:'ti-certificate'},
+  instrumentos:{label:'Instrumentos',icon:'ti-clipboard-list'},
+  periodos:{label:'Períodos',icon:'ti-calendar'},
+  config:{label:'Configuración',icon:'ti-settings'}
+};
+const NAV_LABELS_DOC = {
+  bienvenida:{label:'Inicio',icon:'ti-home'},
+  migrupo:{label:'Mi grupo',icon:'ti-users'},
+  actividades:{label:'Actividades',icon:'ti-flag'},
+  equipos:{label:'Equipos',icon:'ti-arrows-shuffle'},
+  carga:{label:'Cargar estudiantes',icon:'ti-file-upload'},
+  reporte:{label:'Reporte',icon:'ti-chart-bar'},
+  alertas:{label:'Alertas',icon:'ti-alert-triangle'},
+  observacion:{label:'Mi observación',icon:'ti-message-circle'}
+};
+let NAV_HISTORY = {admin:[], doc:[]};
+
+function renderBreadcrumbAdmin(sec){
+  const bar = document.getElementById('a-breadcrumb');
+  if(!bar) return;
+  const info = NAV_LABELS_ADMIN[sec]||{label:sec,icon:'ti-circle'};
+  const hasPrev = NAV_HISTORY.admin.length > 0;
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    ${hasPrev && sec!=='bienvenida' ? `<button class="bc-back" onclick="goBackAdmin()"><i class="ti ti-arrow-left"></i> Volver</button>` : ''}
+    <div class="bc-item" onclick="aN('bienvenida')" style="cursor:pointer"><i class="ti ti-home" style="font-size:12px"></i> H21</div>
+    ${sec!=='bienvenida' ? `<span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+    <div class="bc-item active"><i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}</div>` : 
+    `<span class="bc-sep"><i class="ti ti-chevron-right"></i></span><div class="bc-item active"><i class="ti ti-home" style="font-size:12px"></i> Inicio</div>`}
+  `;
+}
+
+function renderBreadcrumbDoc(sec){
+  const bar = document.getElementById('d-breadcrumb');
+  if(!bar) return;
+  const info = NAV_LABELS_DOC[sec]||{label:sec,icon:'ti-circle'};
+  const hasPrev = NAV_HISTORY.doc.length > 0;
+  bar.style.display = 'flex';
+  bar.innerHTML = `
+    ${hasPrev && sec!=='bienvenida' ? `<button class="bc-back" onclick="goBackDoc()"><i class="ti ti-arrow-left"></i> Volver</button>` : ''}
+    <div class="bc-item" onclick="dN('bienvenida')" style="cursor:pointer"><i class="ti ti-home" style="font-size:12px"></i> H21</div>
+    ${sec!=='bienvenida' ? `<span class="bc-sep"><i class="ti ti-chevron-right"></i></span>
+    <div class="bc-item active"><i class="ti ${info.icon}" style="font-size:12px"></i> ${info.label}</div>` :
+    `<span class="bc-sep"><i class="ti ti-chevron-right"></i></span><div class="bc-item active"><i class="ti ti-home" style="font-size:12px"></i> Inicio</div>`}
+  `;
+}
+
+function goBackAdmin(){
+  if(NAV_HISTORY.admin.length===0) return;
+  const prev = NAV_HISTORY.admin.pop();
+  aN(prev);
+}
+function goBackDoc(){
+  if(NAV_HISTORY.doc.length===0) return;
+  const prev = NAV_HISTORY.doc.pop();
+  dN(prev);
+}
+
+// Interceptar botón atrás del navegador
+window.addEventListener('popstate', function(e){
+  if(!APP.session) return;
+  if(APP.session.rol==='admin'){ 
+    if(NAV_HISTORY.admin.length>0) goBackAdmin(); 
+    else aN('bienvenida');
+  } else if(APP.session.rol==='docente'){
+    if(NAV_HISTORY.doc.length>0) goBackDoc();
+    else dN('bienvenida');
+  } else if(APP.session.rol==='estudiante'){
+    renderBienvenidaEst();
+  }
+  history.pushState(null,'',window.location.pathname+'#');
+});
 
 </script>
 </body>
