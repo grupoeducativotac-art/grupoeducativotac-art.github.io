@@ -3223,6 +3223,41 @@ function confirmarEliminarEquipo(gId, correo, nombre){
 // ═══════════════════════════════════════════════════════
 // MODAL CONFIGURAR EQUIPOS
 // ═══════════════════════════════════════════════════════
+
+
+let ceqModo = 'integrantes';
+let ceqValInt = 5;
+let ceqValCant = 4;
+
+function selCeqModo(modo){
+  ceqModo = modo;
+  const cardInt = document.getElementById('ceq-card-int');
+  const cardCant = document.getElementById('ceq-card-cant');
+  if(cardInt) cardInt.style.borderColor = modo==='integrantes'?'var(--ac)':'var(--g200)';
+  if(cardCant) cardCant.style.borderColor = modo==='cantidad'?'var(--ac)':'var(--g200)';
+  previewConfigEquipos();
+}
+
+function ajustarCeq(tipo, delta){
+  if(tipo==='int'){
+    ceqValInt = Math.max(2, Math.min(20, ceqValInt + delta));
+    const el = document.getElementById('ceq-n-int');
+    if(el) el.textContent = ceqValInt;
+  } else {
+    ceqValCant = Math.max(2, Math.min(30, ceqValCant + delta));
+    const el = document.getElementById('ceq-n-cant');
+    if(el) el.textContent = ceqValCant;
+  }
+  previewConfigEquipos();
+}
+
+
+
+
+
+// ═══════════════════════════════════════════════════════
+// MODAL CONFIGURAR EQUIPOS
+// ═══════════════════════════════════════════════════════
 function abrirConfigEquipos(){
   const modal = document.getElementById('modal-config-equipos');
   if(!modal) return;
@@ -3612,54 +3647,69 @@ async function guardarKanban(){
 
 <!-- MODAL CONFIGURAR EQUIPOS -->
 <div class="modal-bg" id="modal-config-equipos">
-  <div class="modal" style="max-width:520px">
+  <div class="modal" style="max-width:560px">
     <div class="modal-title">
-      <span><i class="ti ti-layout-grid" style="color:var(--ac)"></i> Configurar equipos</span>
+      <span><i class="ti ti-layout-grid" style="color:var(--ac)"></i> Configurar equipos de trabajo</span>
       <span class="modal-close" onclick="closeModal('modal-config-equipos')"><i class="ti ti-x"></i></span>
     </div>
-    
-    <div class="fr">
-      <div class="fgg">
-        <label>Grupo a configurar</label>
-        <select id="ceq-grupo" onchange="previewConfigEquipos()">
-          <option value="">Seleccione un grupo...</option>
-        </select>
-      </div>
+
+    <!-- PASO 1: Grupo -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">1. Seleccione el grupo</div>
+      <select id="ceq-grupo" onchange="previewConfigEquipos()" style="width:100%;border:1.5px solid var(--g200);border-radius:6px;padding:10px;font-size:13px;color:var(--g800);font-family:var(--f);outline:none">
+        <option value="">Seleccione un grupo...</option>
+      </select>
     </div>
 
-    <div class="fr c2">
-      <div class="fgg">
-        <label>Configurar por</label>
-        <select id="ceq-modo" onchange="previewConfigEquipos()">
-          <option value="integrantes">Integrantes por equipo</option>
-          <option value="cantidad">Cantidad de equipos</option>
-        </select>
-      </div>
-      <div class="fgg">
-        <label>Número</label>
-        <input type="number" id="ceq-n" value="5" min="2" max="20" oninput="previewConfigEquipos()">
-      </div>
-    </div>
-
-    <div class="fr">
-      <div class="fgg">
-        <label>Tipo de asignación</label>
-        <div style="display:flex;gap:16px;margin-top:6px">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-            <input type="radio" name="ceq-tipo" value="aleatorio" checked> Aleatoria
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
-            <input type="radio" name="ceq-tipo" value="alfabetico"> Alfabética
-          </label>
+    <!-- PASO 2: Tamaño -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">2. Definir tamaño de los equipos</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="border:2px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s" id="ceq-card-int" onclick="selCeqModo('integrantes')" >
+          <div style="font-size:22px;font-weight:800;color:var(--p)" id="ceq-n-int-display">5</div>
+          <div style="font-size:12px;font-weight:600;color:var(--g700);margin-top:2px">Integrantes por equipo</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:3px">El sistema calcula cuántos equipos se crean</div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:6px">
+            <button onclick="event.stopPropagation();ajustarCeq('int',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--g200);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">−</button>
+            <span id="ceq-n-int" style="font-size:16px;font-weight:700;color:var(--p);min-width:24px;text-align:center">5</span>
+            <button onclick="event.stopPropagation();ajustarCeq('int',1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--g200);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">+</button>
+            <span style="font-size:11px;color:var(--g400)">por equipo</span>
+          </div>
+        </div>
+        <div style="border:2px solid var(--g200);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s" id="ceq-card-cant" onclick="selCeqModo('cantidad')">
+          <div style="font-size:22px;font-weight:800;color:var(--p)" id="ceq-n-cant-display">4</div>
+          <div style="font-size:12px;font-weight:600;color:var(--g700);margin-top:2px">Cantidad de equipos</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:3px">El sistema calcula cuántos estudiantes por equipo</div>
+          <div style="margin-top:10px;display:flex;align-items:center;gap:6px">
+            <button onclick="event.stopPropagation();ajustarCeq('cant',-1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--g200);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">−</button>
+            <span id="ceq-n-cant" style="font-size:16px;font-weight:700;color:var(--p);min-width:24px;text-align:center">4</span>
+            <button onclick="event.stopPropagation();ajustarCeq('cant',1)" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--g200);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">+</button>
+            <span style="font-size:11px;color:var(--g400)">equipos en total</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <div id="ceq-preview"></div>
+    <!-- PASO 3: Tipo -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">3. Tipo de asignación</div>
+      <div style="display:flex;gap:10px">
+        <label style="flex:1;border:2px solid var(--g200);border-radius:var(--r);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--g700);transition:all .2s" id="ceq-lbl-alea">
+          <input type="radio" name="ceq-tipo" value="aleatorio" checked onchange="previewConfigEquipos()"> 🎲 Aleatoria
+        </label>
+        <label style="flex:1;border:2px solid var(--g200);border-radius:var(--r);padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--g700);transition:all .2s" id="ceq-lbl-alfa">
+          <input type="radio" name="ceq-tipo" value="alfabetico" onchange="previewConfigEquipos()"> 🔤 Alfabética
+        </label>
+      </div>
+    </div>
 
-    <div class="btn-group" style="margin-top:16px">
-      <button class="btn btn-p" onclick="aplicarConfigEquipos()">
-        <i class="ti ti-check"></i> Aplicar configuración
+    <!-- PREVIEW -->
+    <div id="ceq-preview" style="margin-bottom:16px"></div>
+
+    <!-- BOTONES -->
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-p" style="flex:1;justify-content:center" onclick="aplicarConfigEquipos()">
+        <i class="ti ti-check"></i> Crear equipos y guardar
       </button>
       <button class="btn btn-s" onclick="closeModal('modal-config-equipos')">Cancelar</button>
     </div>
