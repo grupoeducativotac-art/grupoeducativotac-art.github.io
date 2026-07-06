@@ -1604,8 +1604,15 @@ function dN(sec){
   const m=q('d-main');
   const renders={bienvenida:rDocenteBienvenida,migrupo:rDocGrupo,actividades:rDocActividades,equipos:rDocEquipos,carga:rDocCarga,reporte:rDocReporte,alertas:rDocAlertas,observacion:rDocObservacion,evaluar:rDocEvaluarEstudiantes};
   m.innerHTML=(renders[sec]||rDocGrupo)();
-  setTimeout(()=>renderBreadcrumbDoc(sec),100);
-  if(sec==='reporte')setTimeout(()=>renderDocCharts(),100);
+  setTimeout(()=>{
+    renderBreadcrumbDoc(sec);
+    if(sec==='evaluar'){ 
+      evalModoActual='individual';
+      evalDocCompActual=0;
+      selCompEvalDoc(0);
+    }
+    if(sec==='reporte') renderDocCharts();
+  },100);
 }
 
 function getDocGrupo(){return DB.grupos.find(x=>x.id===APP.session.grupoId);}
@@ -1639,9 +1646,11 @@ function rDocGrupo(){
         return `<tr><td><b>${e.nombresApellidos}</b></td><td>${e.documento}</td><td style="font-size:11px">${e.correo}</td>
           <td><span class="badge ${ev>=(DB.config.metaCert||40)?'bg-su':ev>0?'bg-wa':'bg-gy'}">${ev}/${DB.config.metaCert||40}</span></td>
           <td>
-            <button class="btn btn-s btn-sm" onclick="abrirEditEst('${g.id}','${e.correo}')"><i class="ti ti-edit"></i></button>
-            <button class="btn btn-s btn-sm" onclick="abrirMoverEquipo('${g.id}','${e.correo}')"><i class="ti ti-arrows-shuffle"></i></button>
-            <button class="btn btn-da btn-sm" onclick="eliminarEstudiante('${g.id}','${e.correo}')"><i class="ti ti-trash"></i></button>
+            <div style="display:flex;gap:4px">
+              <button class="action-btn ver" title="Ver progreso" onclick="verProgresoEstudiante('${e.correo}','${g.id}')"><i class="ti ti-chart-bar"></i></button>
+              <button class="action-btn edi" title="Editar" onclick="abrirEditEst('${g.id}','${e.correo}')"><i class="ti ti-edit"></i></button>
+              <button class="action-btn del" title="Eliminar" onclick="eliminarEstudiante('${g.id}','${e.correo}')"><i class="ti ti-trash"></i></button>
+            </div>
           </td></tr>`;
       }).join('')}</tbody></table></div></div>`;
   }).join('')}`;
@@ -1834,10 +1843,10 @@ function allOk(){return COMPETENCIAS.every((_,ci)=>isCompOk(ci));}
 function goStep(n){
   APP.evalStep=n;renderStepper();
   const body=q('e-body');
-  if(n===0)body.innerHTML=renderInstr('entrada');
+  if(n===0){body.style.background='var(--g100)';body.innerHTML=renderInstr('entrada');}
   else if(n===1){body.innerHTML=`<div style="display:flex;flex-direction:column;height:100%"><div class="ctabs" id="ctabs-est"></div><div style="flex:1;overflow-y:auto;padding:18px" id="cbody-est"></div></div>`;renderCtabs();renderComp(0);}
-  else if(n===2)body.innerHTML=renderInstr('salida');
-  else if(n===3)body.innerHTML=renderObsEst();
+  else if(n===2){body.style.background='var(--g100)';body.innerHTML=renderInstr('salida');}
+  else if(n===3){body.style.background='var(--g100)';body.innerHTML=renderObsEst();}
 }
 
 // INSTRUMENTO
@@ -4067,6 +4076,7 @@ let evalDocCompActual = 0;
 
 function selCompEvalDoc(ci){
   evalDocCompActual = ci;
+  if(typeof evalModoActual === 'undefined') evalModoActual = 'individual';
   COMPETENCIAS.forEach((_,i)=>{
     const btn = document.getElementById(`btn-comp-doc-${i}`);
     if(btn){
