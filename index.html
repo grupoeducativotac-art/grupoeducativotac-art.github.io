@@ -756,7 +756,7 @@ let DB={
   logs:[]
 };
 
-function saveDB(){localStorage.setItem('h21_v2',JSON.stringify(DB));}
+
 function loadDB(){const d=localStorage.getItem('h21_v2');if(d){try{Object.assign(DB,JSON.parse(d));}catch(e){console.error(e);}}}
 
 // ═══════════════════════════════════════════════════════
@@ -2152,8 +2152,14 @@ async function saveToSupabase(){
         if(!existe || existe.length === 0){
           await sbPost('estudiantes', {
             grupo_id: g.id, documento: e.documento, nombres_apellidos: e.nombresApellidos,
-            correo: e.correo, equipo: e.equipo, semestre: e.semestre, grupo_letra: e.grupo
+            correo: e.correo, equipo: e.equipo||'', semestre: e.semestre, grupo_letra: e.grupo
           });
+        } else {
+          // Actualizar equipo si cambió
+          await sbPatch('estudiantes', 
+            `grupo_id=eq.${g.id}&correo=eq.${encodeURIComponent(e.correo)}`,
+            {equipo: e.equipo||''}
+          );
         }
       }
     }
@@ -2216,10 +2222,7 @@ async function saveToSupabase(){
 }
 
 // Override saveDB para que guarde en Supabase Y local
-function saveDB(){
-  localStorage.setItem('h21_v2', JSON.stringify(DB));
-  saveToSupabase().catch(console.error);
-}
+
 
 // ═══════════════════════════════════════════════════════
 // INICIALIZAR — Sincronizar al cargar
@@ -2371,7 +2374,8 @@ function salirModoViewer(){
 const _origSaveDB = saveDB;
 function saveDB(){
   if(window._savingDisabled){ console.log('Modo viewer — guardado deshabilitado'); return; }
-  _origSaveDB();
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+  saveToSupabase().catch(e=>console.error('Supabase sync error:', e));
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3174,7 +3178,13 @@ function guardarCambiosEquipos(){
     }
   }
   pendingChanges = {};
-  saveDB();
+  // Guardar local + Supabase
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+  saveToSupabase().then(()=>{
+    showToast(`✅ ${count} cambio(s) guardados en la base de datos`);
+  }).catch(()=>{
+    showToast(`✅ ${count} cambio(s) guardados localmente`);
+  });
   
   // Limpiar estilos changed
   document.querySelectorAll('.eq-select.changed').forEach(s=>{
@@ -3278,10 +3288,16 @@ function aplicarConfigEquipos(){
   saveDB();
   
   const numEq = Math.ceil(g.estudiantes.length/porEquipo);
+  saveDB();
   closeModal('modal-config-equipos');
   showToast(`✅ ${numEq} equipos configurados para ${g.asignatura?.nombre}`);
   logActivity(`Configuró ${numEq} equipos para ${g.asignatura?.nombre}`);
-  aN('estudiantes');
+  aN('equipos');
+  // Mostrar el kanban con los nuevos equipos
+  setTimeout(()=>{
+    const sel = document.getElementById('kb-grupo');
+    if(sel){ sel.value = gId; cargarKanban(); }
+  }, 300);
 }
 
 // saveDB ya está definido globalmente con soporte Supabase
@@ -3567,12 +3583,25 @@ function generarEquiposKanban(){
 }
 
 // ── GUARDAR KANBAN ────────────────────────────────────────
-function guardarKanban(){
-  if(!kanbanGrupoId) return;
-  saveDB();
-  kanbanChanges = false;
-  logActivity(`Guardó organización de equipos`);
-  showToast('✅ Equipos guardados correctamente');
+async function guardarKanban(){
+  if(!kanbanGrupoId){ showToast('Seleccione un grupo primero', 'wa'); return; }
+  const btn = document.getElementById('kb-save-btn');
+  if(btn){ btn.innerHTML='<i class="ti ti-loader"></i> Guardando...'; btn.disabled=true; }
+  
+  // Guardar en localStorage inmediatamente
+  localStorage.setItem('h21_v2', JSON.stringify(DB));
+  
+  // Guardar en Supabase
+  try {
+    await saveToSupabase();
+    kanbanChanges = false;
+    logActivity('Guardó organización de equipos en Kanban');
+    showToast('✅ Equipos guardados en la base de datos');
+  } catch(e){
+    showToast('Guardado localmente. Error Supabase: ' + e.message, 'wa');
+  }
+  
+  if(btn){ btn.innerHTML='<i class="ti ti-device-floppy"></i> Guardar cambios'; btn.disabled=false; }
 }
 
 </script>
